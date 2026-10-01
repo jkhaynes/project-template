@@ -23,12 +23,12 @@
 - [Thing that sounds related but is out of scope]
 
 ## Core Capabilities
-<!-- High level. Each one usually becomes one or more Spec Kit features. -->
-| # | Capability | Priority | Spec |
-|---|------------|----------|------|
-| 1 | [Capability] | Must | `specs/001-...` |
-| 2 | [Capability] | Should | not started |
-| 3 | [Capability] | Could | not started |
+<!-- High level. Each one usually becomes one or more Spec Kit features. Release (v1 / v2 / later) keeps future ideas in the list without building them yet. -->
+| # | Capability | Release | Priority | Spec |
+|---|------------|---------|----------|------|
+| 1 | [Capability] | v1 | Must | `specs/001-...` |
+| 2 | [Capability] | v1 | Should | not started |
+| 3 | [Capability] | later | Could | not started |
 
 ## Success Measures
 - [How you'll know it works: usage, time saved, a portfolio demo, revenue, etc.]
