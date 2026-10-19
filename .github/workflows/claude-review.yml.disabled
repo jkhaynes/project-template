@@ -1,0 +1,61 @@
+# OPTIONAL, PAID, OFF BY DEFAULT: Claude reviews every PR against REVIEW.md.
+#
+# Cost: every PR open and every push to it runs a Claude Code session in CI. With an API key
+# that is billed per token on your Anthropic account. With a subscription OAuth token it uses
+# your Claude plan's usage limits instead. The local /code-review and /security-review passes
+# (CLAUDE.md, implementation step 3) cover the same ground for free, which is why this is off.
+#
+# To turn it on:
+#   1. Add ONE repo secret (Settings > Secrets and variables > Actions):
+#      - ANTHROPIC_API_KEY: an API key from console.anthropic.com, or
+#      - CLAUDE_CODE_OAUTH_TOKEN: a Claude subscription token from `claude setup-token`.
+#      Then keep the matching line under `with:` below and delete the other.
+#   2. Install the Claude GitHub app on the repo (`/install-github-app` in Claude Code does both).
+#   3. Rename this file to claude-review.yml and uncomment everything below.
+#
+# Checked against anthropics/claude-code-action@v1 (docs/solutions.md, "Automatic PR Code
+# Review") on 2026-10-19. Re-check its README if inputs have changed.
+#
+# name: Claude review
+#
+# on:
+#   pull_request:
+#     types: [opened, synchronize, ready_for_review]
+#
+# concurrency:
+#   group: claude-review-${{ github.ref }}
+#   cancel-in-progress: true
+#
+# jobs:
+#   review:
+#     if: github.event.pull_request.draft == false
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#       pull-requests: write
+#       id-token: write
+#     steps:
+#       - uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 1
+#
+#       - uses: anthropics/claude-code-action@v1
+#         with:
+#           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+#           # claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+#           prompt: |
+#             REPO: ${{ github.repository }}
+#             PR NUMBER: ${{ github.event.pull_request.number }}
+#
+#             Review this pull request. Follow REVIEW.md in the repo root exactly: what to always
+#             check, what not to flag, the severity levels, and the review loop limits. Read
+#             .specify/memory/constitution.md and the linked spec if the PR names one.
+#             If this PR already has review comments from you, review only the new diff and
+#             don't repeat findings that were resolved or dismissed.
+#
+#             The PR branch is checked out in the working directory.
+#             Use `gh pr comment` for a short summary with findings grouped by severity.
+#             Use `mcp__github_inline_comment__create_inline_comment` (with `confirmed: true`)
+#             for findings tied to a line. Only post GitHub comments.
+#           claude_args: |
+#             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
