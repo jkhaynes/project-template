@@ -12,6 +12,7 @@ Full product context: `docs/prd.md`. Current status and next step: `docs/state.m
 # Test:    [e.g. dotnet test]
 # Run:     [e.g. dotnet run --project src/Api]
 # Lint:    [e.g. dotnet format --verify-no-changes]
+# Check: ./scripts/check.sh               # format, lint, test, build; the one definition of green
 ```
 
 ## Stack
