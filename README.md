@@ -20,7 +20,7 @@ docs/
   memory/constitution.md      Pre-filled starter: TDD, Superpowers owns implementation
 .claude/
   settings.json               Enables Superpowers, allows Spec Kit scripts, registers hooks
-  hooks/merge-gate.py         Blocks merging on red CI and pushing to main/master
+  hooks/merge-gate.(sh|py)    Blocks merging on red CI and pushing to main/master
   hooks/format-file.py        Formats each edited file using hooks/format.json
   hooks/format.json           Extension to formatter map (empty; see format.example.json)
   skills/speckit-*            Spec Kit skills (/speckit-specify, /speckit-plan, ...)
@@ -76,7 +76,7 @@ Adapted from Anthropic's write-up on [solving code review](https://claude.dev/bl
 | Local, while editing | `format-file.py` hook formats each edited file (once `format.json` is filled in) | Free |
 | Local, before the PR | `scripts/check` (format, lint, test, build); Superpowers reviews; `/code-review` then `/security-review`, each finding fixed or answered in the PR | Free (subscription) |
 | CI, on every PR | `ci.yml` job `check` runs `scripts/check.sh` | Free (Actions minutes) |
-| Merge | `merge-gate.py` blocks `gh pr merge` until `gh pr checks` is green, blocks pushes to `main`/`master`, and lets a local merge into them through only if `scripts/check` passes | Free |
+| Merge | `merge-gate.py` blocks `gh pr merge` until `gh pr checks` is green, blocks pushes to `main`/`master`, and lets a local `git merge`/`git pull` of a branch into them through only if that branch's PR checks are green (CI ran `scripts/check.sh` on it). If Python can't start, `merge-gate.sh` still blocks merges | Free |
 | After merge | Escaped bugs in `docs/state.md` get a regression test and, when a reviewer should have caught them, a rule in `REVIEW.md` | Free |
 | Optional | `claude-review.yml.disabled` and `security-review.yml.disabled`: Claude reviews in CI. Off by default to keep projects free to run. To turn one on, rename it to `.yml` and add the secret its header names | Paid per PR |
 
@@ -84,7 +84,7 @@ On a private repo on the free GitHub plan, branch protection isn't available, so
 
 ## Notes and gotchas
 
-- **Hooks need Python 3 on PATH as `python3`.** Both hooks are Python scripts. If `python3` isn't found, Claude Code reports a hook error and the merge gate can't run.
+- **Hooks need Python 3 on PATH as `python3`.** Both hooks are Python scripts. If `python3` isn't found, the merge gate blocks every merge and push and format-on-edit does nothing.
 
 - **Don't use `/speckit-implement`.** Implementation goes through Superpowers (see constitution principle III). The skill is left installed because Spec Kit manages its own files; deleting it would come back on upgrade.
 - **Plan mode:** if Claude Code switches into plan mode during Spec Kit or Superpowers planning steps, exit it. Both tools write their own plan files and plan mode fights them.

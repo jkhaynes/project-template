@@ -69,7 +69,7 @@ Do NOT use `/speckit-implement`. Instead, for `specs/NNN-*/tasks.md`:
 1. Feature branch in the main checkout (`git checkout -b NNN-feature-name`), so the owner can follow along in their own editor. No worktrees (skip using-git-worktrees).
 2. subagent-driven-development : one fresh subagent per task from tasks.md, test-first (red, green, refactor), spec-compliance review then code-quality review
 3. requesting-code-review : before merge. Then run `/code-review`, then `/security-review`, on the branch. Fix each finding test-first, or write why not in the PR's "Review findings not fixed".
-4. Open a PR, wait for `gh pr checks --watch` to be green, then merge. The merge-gate hook (`.claude/hooks/merge-gate.py`) blocks merging on red, pushing to `main`/`master`, and local merges that fail `scripts/check`.
+4. Open a PR, wait for `gh pr checks --watch` to be green, then merge. The merge-gate hook (`.claude/hooks/merge-gate.py`) blocks merging on red, pushing to `main`/`master`, and local merges of a branch whose PR checks aren't green.
 
 If implementation reveals the spec was wrong, stop and update spec.md/plan.md first, then continue.
 

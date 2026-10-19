@@ -21,8 +21,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/merge-gate.py\"",
-            "timeout": 1800
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/merge-gate.sh\"",
+            "timeout": 300
           }
         ]
       }
