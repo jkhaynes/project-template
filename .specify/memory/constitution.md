@@ -1,5 +1,8 @@
 # [PROJECT_NAME] Constitution
 <!-- Starter constitution from the project template. Run /speckit-constitution to tailor it to this project; it will fill the bracketed placeholders and bump the version. -->
+<!-- Starter 0.2.0: every change passes scripts/check and every review finding is fixed or answered in the PR. -->
+
+
 
 ## Core Principles
 
@@ -27,11 +30,11 @@ Architectural decisions (libraries, data stores, patterns, notable trade-offs) a
 ## Development Workflow
 
 - One feature per branch/worktree; `main` stays releasable.
-- Every change passes build, tests and lint before merge.
+- Every change passes `scripts/check`, and every review finding is fixed or answered in the PR.
 - Commit messages: [e.g. Conventional Commits]
 
 ## Governance
 
 This constitution supersedes other practice docs when they conflict. Amendments are made through `/speckit-constitution`, with the version bumped (MAJOR for removed or redefined principles, MINOR for added ones, PATCH for wording) and a short note of what changed.
 
-**Version**: 0.1.0 | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
+**Version**: 0.2.0 | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
