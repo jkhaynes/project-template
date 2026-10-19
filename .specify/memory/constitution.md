@@ -3,7 +3,6 @@
 <!-- Starter 0.2.0: every change passes scripts/check and every review finding is fixed or answered in the PR. -->
 
 
-
 ## Core Principles
 
 ### I. Spec Before Code

@@ -70,3 +70,9 @@ If implementation reveals the spec was wrong, stop and update spec.md/plan.md fi
 - Update `docs/state.md` (what changed, what's next, any blockers).
 - Made a real architectural decision (library, data store, pattern, trade-off)? Add an ADR in `docs/adr/`.
 - Changed how components connect? Update `docs/architecture.md`.
+- Did a bug reach main? Log it under Escaped bugs in `docs/state.md` and close the loop.
+
+## Learned rules
+
+<!-- Short rules from owner corrections, dated. -->
+

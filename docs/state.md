@@ -17,5 +17,8 @@
 ## Blockers / Open Questions
 - [Anything waiting on a decision, an API key, research, etc.]
 
+## Escaped bugs
+<!-- Bugs that reached main. Each gets a regression test (red first) and, if a reviewer should have caught it, a line in REVIEW.md's Learned review rules. -->
+
 ## Notes for Next Session
 [Anything that isn't obvious from the code or git log: a half-finished idea, a gotcha, a test that's flaky.]
