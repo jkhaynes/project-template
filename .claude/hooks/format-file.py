@@ -8,6 +8,7 @@ Never blocks: always exits 0 and logs failures to stderr.
 """
 import json
 import os
+import shlex
 import subprocess
 import sys
 
@@ -28,7 +29,10 @@ def main():
         template = config.get(ext)
         if not template:
             return
-        cmd = template.replace("{file}", '"' + path.replace('"', '\\"') + '"')
+        # POSIX: single-quote so $(...) or backticks in a file name can't run.
+        # Windows (cmd.exe): file names can't contain ", so double quotes are enough.
+        quoted = '"' + path + '"' if os.name == "nt" else shlex.quote(path)
+        cmd = template.replace("{file}", quoted)
         r = subprocess.run(cmd, shell=True, cwd=root, capture_output=True, text=True,
                            encoding="utf-8", errors="replace", timeout=120)
         if r.returncode != 0:
