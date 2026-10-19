@@ -9,7 +9,9 @@
       "Bash(git status)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
-      "Bash(git worktree:*)"
+      "Bash(git worktree:*)",
+      "Bash(rm *.tmp.*)",
+      "Bash(rm -f *.tmp.*)"
     ]
   },
   "hooks": {

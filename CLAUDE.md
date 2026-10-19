@@ -26,6 +26,12 @@ Full product context: `docs/prd.md`. Current status and next step: `docs/state.m
 - [Data access pattern]
 - Never commit secrets. Config goes in [appsettings.Development.json / .env], both gitignored.
 
+## Temporary files
+- Name throwaway files in the repo `<name>.tmp.<ext>` (gitignored by `*.tmp.*`).
+- Temp folders, downloads and logs go in the session scratchpad, not the repo.
+- Delete files with a plain `rm` on the exact file. Never `rm -rf`.
+- Leave `.superpowers/sdd/tasks/` in place.
+
 ## Where things live
 | Need | Read |
 |------|------|
@@ -49,6 +55,7 @@ This project uses **Spec Kit for design** and **Superpowers for implementation**
 - **Spike / experiment**: Superpowers brainstorming, throwaway branch, no spec. If it survives, promote it to a feature.
 
 **2. Feature track: design (Spec Kit owns this)**
+0. Mockup first: any feature with new or changed UI gets a mockup on a claude.ai Design canvas before `/speckit-specify`. Planning waits for the owner's explicit approval. Record it in `specs/NNN-*/mockup.md` (canvas link, approval date, what was approved), with a copy of the canvas files in `specs/NNN-*/mockup/`.
 1. `/speckit-specify` : what and why, no tech choices
 2. `/speckit-clarify` : resolve ambiguity before planning
 3. `/speckit-plan` : technical approach
@@ -59,7 +66,7 @@ During these steps Spec Kit is the source of truth. Do not run Superpowers brain
 
 **3. Feature track: implementation (Superpowers owns this)**
 Do NOT use `/speckit-implement`. Instead, for `specs/NNN-*/tasks.md`:
-1. using-git-worktrees : isolated branch/worktree for the feature
+1. Feature branch in the main checkout (`git checkout -b NNN-feature-name`), so the owner can follow along in their own editor. No worktrees (skip using-git-worktrees).
 2. subagent-driven-development : one fresh subagent per task from tasks.md, test-first (red, green, refactor), spec-compliance review then code-quality review
 3. requesting-code-review : before merge. Then run `/code-review`, then `/security-review`, on the branch. Fix each finding test-first, or write why not in the PR's "Review findings not fixed".
 4. Open a PR, wait for `gh pr checks --watch` to be green, then merge. The merge-gate hook (`.claude/hooks/merge-gate.py`) blocks merging on red, pushing to `main`/`master`, and local merges that fail `scripts/check`.

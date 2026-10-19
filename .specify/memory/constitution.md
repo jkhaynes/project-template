@@ -1,6 +1,6 @@
 # [PROJECT_NAME] Constitution
 <!-- Starter constitution from the project template. Run /speckit-constitution to tailor it to this project; it will fill the bracketed placeholders and bump the version. -->
-<!-- Starter 0.2.0: every change passes scripts/check and every review finding is fixed or answered in the PR. -->
+<!-- Starter 0.2.0: every change passes scripts/check and every review finding is fixed or answered in the PR. Principle III: feature branch in the main checkout instead of a worktree. -->
 
 
 ## Core Principles
@@ -12,7 +12,7 @@ Every feature starts as a spec in `specs/NNN-feature-name/` (spec.md, plan.md, t
 Tests are written before implementation and must fail before any production code is written (red, green, refactor). Code written before its test is deleted and rewritten test-first. See `docs/testing.md` for what to test at which level.
 
 ### III. Superpowers Owns Implementation
-Implementation of any Spec Kit task list MUST follow the Superpowers workflow: git worktree, test-driven development, subagent-driven execution with spec-compliance review then code-quality review, code review, finish branch. `/speckit-implement` is not used in this project.
+Implementation of any Spec Kit task list MUST follow the Superpowers workflow: a feature branch in the main checkout (no worktrees, so the owner can follow along in their own editor), test-driven development, subagent-driven execution with spec-compliance review then code-quality review, code review, finish branch. `/speckit-implement` is not used in this project.
 
 ### IV. Simplicity
 Build the smallest thing that satisfies the spec. No speculative abstractions, no features outside the current spec. Added complexity must be justified in plan.md or an ADR.
@@ -28,7 +28,7 @@ Architectural decisions (libraries, data stores, patterns, notable trade-offs) a
 
 ## Development Workflow
 
-- One feature per branch/worktree; `main` stays releasable.
+- One feature per branch; the default branch (`main` or `master`) stays releasable.
 - Every change passes `scripts/check`, and every review finding is fixed or answered in the PR.
 - Commit messages: [e.g. Conventional Commits]
 
