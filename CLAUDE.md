@@ -34,6 +34,7 @@ Full product context: `docs/prd.md`. Current status and next step: `docs/state.m
 | Why a past decision was made | `docs/adr/` (index in `docs/adr/README.md`) |
 | How to test | `docs/testing.md` |
 | Non-negotiable engineering rules | `.specify/memory/constitution.md` |
+| What reviewers check, severity, loop limits | `REVIEW.md` |
 | Feature specs, plans, tasks | `specs/NNN-feature-name/` |
 
 Read these when the task needs them, not up front.
