@@ -1,6 +1,6 @@
 # Project Template: Spec Kit + Superpowers
 
-Starter repo for new projects built with Claude Code. **Spec Kit** handles design (spec, plan, tasks) and **Superpowers** handles implementation (worktrees, TDD, subagent execution, review).
+Starter repo for new projects built with Claude Code. **Spec Kit** handles design (spec, plan, tasks) and **Superpowers** handles implementation (TDD, subagent execution, review). Quality gates (a local check script, CI, review passes and a merge-gate hook) keep red code out of the default branch.
 
 > Replace this README with the real project README once the project has a name and a purpose. The workflow details live in `CLAUDE.md`, so nothing is lost.
 
@@ -9,6 +9,7 @@ Starter repo for new projects built with Claude Code. **Spec Kit** handles desig
 ```
 CLAUDE.md                     Agent instructions + workflow (short, points to docs)
 AGENTS.md                     Pointer for non-Claude agents (Copilot, Codex, Cursor)
+REVIEW.md                     What every reviewer checks, severity, review loop limits
 docs/
   prd.md                      Product-level requirements, goals, NON-goals
   architecture.md             Current system shape across all features
@@ -18,8 +19,16 @@ docs/
 .specify/                     Spec Kit (templates, Python scripts, constitution)
   memory/constitution.md      Pre-filled starter: TDD, Superpowers owns implementation
 .claude/
-  settings.json               Enables Superpowers, allows Spec Kit scripts
+  settings.json               Enables Superpowers, allows Spec Kit scripts, registers hooks
+  hooks/merge-gate.py         Blocks merging on red CI and pushing to main/master
+  hooks/format-file.py        Formats each edited file using hooks/format.json
+  hooks/format.json           Extension to formatter map (empty; see format.example.json)
   skills/speckit-*            Spec Kit skills (/speckit-specify, /speckit-plan, ...)
+.github/
+  workflows/ci.yml            Runs scripts/check.sh on every PR and on the default branch
+  workflows/*.yml.disabled    Optional paid Claude review and security review (off)
+  pull_request_template.md    Summary, spec, testing, risk, revert, unfixed findings
+scripts/check.(sh|ps1)        The one definition of green: format, lint, test, build
 scripts/init-project.(ps1|sh) One-time placeholder fill + Superpowers install
 specs/                        Created by /speckit-specify, one folder per feature
 ```
@@ -44,7 +53,7 @@ specs/                        Created by /speckit-specify, one folder per featur
    This fills `[PROJECT_NAME]` and date placeholders and installs Superpowers at user scope.
 3. Write `docs/prd.md` yourself (or with Claude in chat). Non-goals matter most.
 4. In Claude Code: `/speckit-constitution` to tailor the rules to this project.
-5. Fill in **Commands** and **Stack** in `CLAUDE.md` once they exist.
+5. Fill in **Commands** and **Stack** in `CLAUDE.md` once they exist, and the same commands at the top of `scripts/check.sh` and `scripts/check.ps1`. Uncomment the setup step for your stack in `.github/workflows/ci.yml`, and map file extensions to formatters in `.claude/hooks/format.json` if you want format-on-edit.
 6. First feature: `/speckit-specify`.
 
 ## Which track?
@@ -54,11 +63,28 @@ specs/                        Created by /speckit-specify, one folder per featur
 | New behavior, several files, worth remembering why | Spec Kit design, then Superpowers implementation |
 | Bug fix, refactor, small tweak | Superpowers only (TDD or systematic-debugging) |
 | Spike or experiment | Superpowers brainstorming on a throwaway branch |
-| Existing repo without this setup | Copy `docs/`, `CLAUDE.md`, `AGENTS.md`, then `specify init --here --integration claude --script py` |
+| Existing repo without this setup | Copy `docs/`, `CLAUDE.md`, `AGENTS.md`, `REVIEW.md`, `scripts/check.*`, `.claude/hooks/`, `.claude/settings.json` and `.github/`, then `specify init --here --integration claude --script py` |
 
 Full step-by-step is in `CLAUDE.md` under **Workflow**.
 
+## Quality gates
+
+Adapted from Anthropic's write-up on [solving code review](https://claude.dev/blog/solving-code-review-at-anthropic/). Everything on by default is free to run.
+
+| Where | What | Cost |
+|-------|------|------|
+| Local, while editing | `format-file.py` hook formats each edited file (once `format.json` is filled in) | Free |
+| Local, before the PR | `scripts/check` (format, lint, test, build); Superpowers reviews; `/code-review` then `/security-review`, each finding fixed or answered in the PR | Free (subscription) |
+| CI, on every PR | `ci.yml` job `check` runs `scripts/check.sh` | Free (Actions minutes) |
+| Merge | `merge-gate.py` blocks `gh pr merge` until `gh pr checks` is green, blocks pushes to `main`/`master`, and lets a local merge into them through only if `scripts/check` passes | Free |
+| After merge | Escaped bugs in `docs/state.md` get a regression test and, when a reviewer should have caught them, a rule in `REVIEW.md` | Free |
+| Optional | `claude-review.yml.disabled` and `security-review.yml.disabled`: Claude reviews in CI. Off by default to keep projects free to run. To turn one on, rename it to `.yml` and add the secret its header names | Paid per PR |
+
+On a private repo on the free GitHub plan, branch protection isn't available, so CI shows red or green but can't stop a merge. The merge-gate hook is the real gate there, and it only runs inside Claude Code. For a repo with no CI, set `MERGE_GATE_ALLOW_NO_CHECKS=1`.
+
 ## Notes and gotchas
+
+- **Hooks need Python 3 on PATH as `python3`.** Both hooks are Python scripts. If `python3` isn't found, Claude Code reports a hook error and the merge gate can't run.
 
 - **Don't use `/speckit-implement`.** Implementation goes through Superpowers (see constitution principle III). The skill is left installed because Spec Kit manages its own files; deleting it would come back on upgrade.
 - **Plan mode:** if Claude Code switches into plan mode during Spec Kit or Superpowers planning steps, exit it. Both tools write their own plan files and plan mode fights them.
