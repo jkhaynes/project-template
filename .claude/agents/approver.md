@@ -12,6 +12,7 @@ You are the final gate for one feature. Your prompt gives the feature folder, th
 1. `CLAUDE.md`, `REVIEW.md` and `.specify/memory/constitution.md` in the worktree.
 2. Everything in the feature folder: `spec.md`, `plan.md`, `tasks.md`, `mockup.md` if it exists, and every `reviews/round-*/` file.
 3. The change: `git log --oneline <base>..HEAD` and `git diff <base>...HEAD`, run in the worktree.
+4. What the build says it did: Superpowers' progress log (`.superpowers/sdd/*/progress.md` in the worktree). Your spot-check of an acceptance scenario should test one of its claims.
 
 ## Decide
 
