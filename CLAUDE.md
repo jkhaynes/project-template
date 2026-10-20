@@ -71,7 +71,7 @@ During these steps Spec Kit is the source of truth. Do not run Superpowers brain
 **3. Feature track: implementation (Superpowers owns this)**
 Do NOT use `/speckit-implement`. Instead, for `specs/NNN-*/tasks.md`:
 1. using-git-worktrees : confirms you're in the feature's worktree from design step 0, installs dependencies and checks the baseline is green
-2. subagent-driven-development : one fresh subagent per task from tasks.md, test-first (red, green, refactor), spec-compliance review then code-quality review
+2. subagent-driven-development : one fresh subagent per task from tasks.md, test-first (red, green, refactor), spec-compliance review then code-quality review. When a task passes its review, check it off in tasks.md (`- [x]`) in that task's commit; Superpowers doesn't, and the dashboard and the approver count those boxes.
 3. requesting-code-review, then `/review-panel` : every `.claude/agents/reviewer-*.md` in parallel, fixes for at most 3 rounds, then the approver writes `decision.md` (`REVIEW.md`, Review panel). On ESCALATE, stop and ask the owner. Findings left unfixed go in the PR's "Review findings not fixed".
 4. Open a PR, wait for `gh pr checks --watch` to be green, then merge. The merge-gate hook (`.claude/hooks/merge-gate.py`) blocks merging on red, pushing to `main`/`master`, and local merges of a branch whose PR checks aren't green.
 
