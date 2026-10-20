@@ -80,6 +80,12 @@ class ParsersTest(unittest.TestCase):
         ctx = {"state": "OPEN", "statusCheckRollup": [{"state": "SUCCESS"}]}
         self.assertEqual(d.ci_summary(ctx)["state"], "green")
 
+    def test_gh_error_summary(self):
+        self.assertEqual(d.gh_error_summary('no pull requests found for branch "x"')["label"], "no PR")
+        self.assertEqual(d.gh_error_summary("none of the git remotes configured for this repository point to a known GitHub host")["label"], "no GitHub remote")
+        self.assertEqual(d.gh_error_summary("To get started with GitHub CLI, please run:  gh auth login")["label"], "gh not logged in")
+        self.assertEqual(d.gh_error_summary("boom")["label"], "gh error")
+
 
 class FakeSource:
     def __init__(self, files):

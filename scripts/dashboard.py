@@ -158,6 +158,17 @@ def ci_summary(pr):
     return {"state": "green", "label": "CI green"}
 
 
+def gh_error_summary(stderr):
+    s = (stderr or "").lower()
+    if "no pull requests found" in s:
+        return ci_summary(None)
+    if "remote" in s:
+        return {"state": "unknown", "label": "no GitHub remote"}
+    if "auth" in s or "logged in" in s:
+        return {"state": "unknown", "label": "gh not logged in"}
+    return {"state": "unknown", "label": "gh error"}
+
+
 # ---------- one feature ----------
 
 def build_feature(feature_id, source, panel, merged=False, ledger="", branch=None, worktree=None, ci=None):
@@ -459,10 +470,8 @@ class CiCache:
             if r.returncode == 0:
                 pr = json.loads(r.stdout)
                 summary = dict(ci_summary(pr), number=pr.get("number"), url=pr.get("url"))
-            elif "no pull requests found" in (r.stderr or "").lower():
-                summary = ci_summary(None)
             else:
-                summary = {"state": "unknown", "label": "gh error"}
+                summary = gh_error_summary(r.stderr)
         with self.lock:
             self.results[branch] = summary
 
