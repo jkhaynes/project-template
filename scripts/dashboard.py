@@ -257,7 +257,9 @@ def build_feature(feature_id, source, panel, merged=False, ledger="", branch=Non
         "rounds": rounds,
         "verdicts": verdicts,
         "decision": decision,
-        "files": files,
+        # Everything above used the full list; only the list shown (and readable) is capped.
+        # Top-level files and reviews first, so a big mockup/ export can't push them out.
+        "files": sorted(files, key=lambda p: (p.startswith("mockup/"), p))[:MAX_FILES],
         "ci": ci or {"state": "none", "label": "no PR"},
     }
 
@@ -282,8 +284,6 @@ class DiskSource:
             dirnames.sort()
             for f in sorted(filenames):
                 out.append(os.path.relpath(os.path.join(dirpath, f), self.folder).replace(os.sep, "/"))
-                if len(out) >= MAX_FILES:
-                    return out
         return out
 
     def read(self, rel):
@@ -304,7 +304,7 @@ class GitSource:
     def list(self):
         out = git(self.cwd, "ls-tree", "-r", "--name-only", self.ref, "--", self.folder + "/", check=False) or ""
         prefix = self.folder + "/"
-        return [l[len(prefix):] for l in out.splitlines() if l.startswith(prefix)][:MAX_FILES]
+        return [l[len(prefix):] for l in out.splitlines() if l.startswith(prefix)]
 
     def read(self, rel):
         return git(self.cwd, "show", f"{self.ref}:{self.folder}/{rel}", check=False)
@@ -382,10 +382,12 @@ def collect_state(start, ci=None):
     features, sources = [], {}
     for branch in feature_branches:
         wt = worktree_of.get(branch)
-        is_ancestor = subprocess.run(["git", "merge-base", "--is-ancestor", branch, base], cwd=root,
-                                     capture_output=True).returncode == 0
-        if not wt and is_ancestor and branch in base_specs:
-            continue  # merged; listed from the default branch below
+        if branch in base_specs:
+            # Merged: its PR says so (covers squash and rebase merges), or a plain merge made it an ancestor.
+            pr_merged = (ci.get(branch) or {}).get("state") == "merged"
+            if pr_merged or subprocess.run(["git", "merge-base", "--is-ancestor", branch, base], cwd=root,
+                                           capture_output=True).returncode == 0:
+                continue  # listed from the default branch below
         if wt:
             fid = worktree_feature_dir(wt, branch)
             src = DiskSource(os.path.join(wt, "specs", fid))
@@ -457,7 +459,11 @@ class CiCache:
             with self.lock:
                 branches = list(self.branches)
             for b in branches:
-                self._fetch(b)
+                try:
+                    self._fetch(b)
+                except Exception as e:  # a timeout or bad output must not stop the refresh loop
+                    with self.lock:
+                        self.results[b] = {"state": "unknown", "label": "gh error", "detail": repr(e)}
             time.sleep(self.interval if branches else 1)
 
     def _fetch(self, branch):
@@ -478,13 +484,18 @@ class CiCache:
 
 # ---------- server ----------
 
+def host_allowed(host, port):
+    """Only answer requests addressed to this machine, which blocks DNS-rebinding reads from web pages."""
+    return host in (f"127.0.0.1:{port}", f"localhost:{port}")
+
+
 class Dashboard:
     def __init__(self, start):
         self.start = start
         self.lock = threading.Lock()
         self.state, self.at = None, 0.0
-        first = collect_state(start)
-        self.ci = CiCache(first["root"])
+        root = parse_worktrees(git(start, "worktree", "list", "--porcelain"))[0]["path"]
+        self.ci = CiCache(root)
 
     def current(self):
         with self.lock:
@@ -495,7 +506,7 @@ class Dashboard:
             return self.state
 
 
-def make_handler(dash):
+def make_handler(dash, port):
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
             pass
@@ -511,6 +522,8 @@ def make_handler(dash):
 
         def do_GET(self):
             url = urlparse(self.path)
+            if not host_allowed(self.headers.get("Host"), port):
+                return self._send(403, "forbidden: open the dashboard at 127.0.0.1 or localhost", "text/plain; charset=utf-8")
             try:
                 if url.path == "/":
                     with open(os.path.join(HERE, "dashboard.html"), encoding="utf-8") as f:
@@ -540,7 +553,7 @@ def main():
         dash = Dashboard(os.getcwd())
     except RuntimeError as e:
         sys.exit(f"dashboard: run this inside the repo ({e})")
-    server = ThreadingHTTPServer(("127.0.0.1", args.port), make_handler(dash))
+    server = ThreadingHTTPServer(("127.0.0.1", args.port), make_handler(dash, args.port))
     url = f"http://127.0.0.1:{args.port}"
     print(f"Review panel dashboard for {dash.current()['repo']}: {url}  (Ctrl+C to stop)")
     if args.open:

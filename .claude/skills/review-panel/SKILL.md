@@ -21,7 +21,7 @@ reviewers (all reviewer-*.md, in parallel) -> WAIT FOR ALL
 3. **Feature folder.** `specs/<branch>/` if it exists. Otherwise the `feature_directory` in `.specify/feature.json`. If neither exists, stop and tell the user which feature folder you expected.
 4. **The panel.** Every file matching `.claude/agents/reviewer-*.md`. Each one's `name:` frontmatter is its `subagent_type`, and `<lens>` is the part of the file name after `reviewer-` (`reviewer-security.md` -> `security`). Adding a file adds a reviewer; nothing else needs to change.
 5. **Round.** N = one more than the highest `reviews/round-<k>/` in the feature folder (1 if there are none). If N is 4 or more, stop: the 3-round limit in REVIEW.md is used up. Tell the user to look at the last round and the decision.
-6. **Ports.** With `n` the feature number (`008` -> 8), the reviewer at position `i` in the panel (alphabetical, from 0) gets port `5100 + 10n + i`. Only reviewers that run the app use it.
+6. **Ports.** With `n` the feature number (`008` -> 8), the reviewer at position `i` in the panel (alphabetical, from 0) gets port `5100 + 10n + i`. Only reviewers that run the app use it. That leaves room for 10 reviewers per feature; past that, ports overlap the next feature's, so give the extra reviewers `5100 + 10n + 9` in turn, one at a time.
 
 ## Round N
 

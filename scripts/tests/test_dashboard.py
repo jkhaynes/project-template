@@ -221,15 +221,49 @@ class RepoTest(unittest.TestCase):
         # A worktree just created, with no spec folder yet.
         git(r, "worktree", "add", "-q", os.path.join(r, ".worktrees", "004-new"), "-b", "004-new", "master")
 
+        # 005 was squash-merged: its specs are on master, but the branch is not an ancestor.
+        git(r, "checkout", "-q", "-b", "005-squashed")
+        write(os.path.join(r, "specs/005-squashed/decision.md"), "APPROVE\n")
+        git(r, "add", "-A")
+        git(r, "commit", "-q", "-m", "005 on branch")
+        git(r, "checkout", "-q", "master")
+        write(os.path.join(r, "specs/005-squashed/decision.md"), "APPROVE\n")
+        git(r, "add", "-A")
+        git(r, "commit", "-q", "-m", "005 squashed")
+
     def tearDown(self):
         shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def test_squash_merged_branch_counts_as_merged_once_its_pr_is_merged(self):
+        by_id = {f["id"]: f for f in d.collect_state(self.repo, ci={})["features"]}
+        self.assertEqual(by_id["005-squashed"]["stage"], "Decision")  # PR state unknown yet
+        merged = {"005-squashed": {"state": "merged", "label": "merged"}}
+        by_id = {f["id"]: f for f in d.collect_state(self.repo, ci=merged)["features"]}
+        self.assertEqual(by_id["005-squashed"]["stage"], "Merged")
+
+    def test_merged_worktree_counts_as_merged(self):
+        merged = {"003-in-tree": {"state": "merged", "label": "merged"}}
+        write(os.path.join(self.repo, "specs/003-in-tree/spec.md"), "# Feature Specification: In tree\n")
+        git(self.repo, "add", "-A")
+        git(self.repo, "commit", "-q", "-m", "003 squashed")
+        by_id = {f["id"]: f for f in d.collect_state(self.repo, ci=merged)["features"]}
+        self.assertEqual(by_id["003-in-tree"]["stage"], "Merged")
+
+    def test_big_mockup_folder_does_not_hide_reviews(self):
+        folder = os.path.join(self.wt, "specs/003-in-tree")
+        for i in range(d.MAX_FILES + 5):
+            write(os.path.join(folder, f"mockup/f{i:03}.html"), "x")
+        write(os.path.join(folder, "reviews/round-1/review-code.md"), "VERDICT: PASS\n")
+        by_id = {f["id"]: f for f in d.collect_state(self.repo, ci={})["features"]}
+        self.assertEqual(by_id["003-in-tree"]["stage"], "Review")
+        self.assertLessEqual(len(by_id["003-in-tree"]["files"]), d.MAX_FILES)
 
     def test_collect_state(self):
         state = d.collect_state(self.repo, ci={})
         self.assertEqual(state["base"], "master")
         self.assertEqual([p["lens"] for p in state["panel"]], ["code", "security"])
         by_id = {f["id"]: f for f in state["features"]}
-        self.assertEqual(sorted(by_id), ["001-done", "002-branch-only", "003-in-tree", "004-new"])
+        self.assertEqual(sorted(by_id), ["001-done", "002-branch-only", "003-in-tree", "004-new", "005-squashed"])
 
         self.assertEqual(by_id["001-done"]["stage"], "Merged")
         self.assertEqual(by_id["001-done"]["name"], "Done thing")
@@ -257,7 +291,16 @@ class RepoTest(unittest.TestCase):
 
     def test_works_from_inside_a_worktree(self):
         state = d.collect_state(self.wt, ci={})
-        self.assertEqual(len(state["features"]), 4)
+        self.assertEqual(len(state["features"]), 5)
+
+
+class HostCheckTest(unittest.TestCase):
+    def test_only_local_hosts_are_allowed(self):
+        self.assertTrue(d.host_allowed("127.0.0.1:4317", 4317))
+        self.assertTrue(d.host_allowed("localhost:4317", 4317))
+        self.assertFalse(d.host_allowed("evil.example:4317", 4317))
+        self.assertFalse(d.host_allowed("127.0.0.1:9999", 4317))
+        self.assertFalse(d.host_allowed(None, 4317))
 
 
 if __name__ == "__main__":
