@@ -30,7 +30,6 @@ docs/
   skills/speckit-*            Spec Kit skills (/speckit-specify, /speckit-plan, ...)
 .github/
   workflows/ci.yml            Runs scripts/check.sh on every PR and on the default branch
-  workflows/*.yml.disabled    Optional paid Claude review and security review (off)
   pull_request_template.md    Summary, spec, testing, risk, revert, unfixed findings
 scripts/check.(sh|ps1)        The one definition of green: format, lint, test, build
 scripts/dashboard.(py|html)   Live, read-only board of every feature (python3 scripts/dashboard.py)
@@ -75,7 +74,7 @@ Full step-by-step is in `CLAUDE.md` under **Workflow**.
 
 ## Quality gates
 
-Adapted from Anthropic's write-up on [solving code review](https://claude.dev/blog/solving-code-review-at-anthropic/). Everything on by default is free to run.
+Adapted from Anthropic's write-up on [solving code review](https://claude.dev/blog/solving-code-review-at-anthropic/). Everything here is free to run: no API keys or paid CI. The review panel uses your Claude subscription.
 
 | Where | What | Cost |
 |-------|------|------|
@@ -85,7 +84,6 @@ Adapted from Anthropic's write-up on [solving code review](https://claude.dev/bl
 | CI, on every PR | `ci.yml` job `check` runs `scripts/check.sh` | Free (Actions minutes) |
 | Merge | `merge-gate.py` blocks `gh pr merge` until `gh pr checks` is green, blocks pushes to `main`/`master`, and lets a local `git merge`/`git pull` of a branch into them through only if that branch's PR checks are green (CI ran `scripts/check.sh` on it). If Python can't start, `merge-gate.sh` still blocks merges | Free |
 | After merge | Escaped bugs in `docs/state.md` get a regression test and, when a reviewer should have caught them, a rule in `REVIEW.md` | Free |
-| Optional | `claude-review.yml.disabled` and `security-review.yml.disabled`: Claude reviews in CI. Off by default to keep projects free to run. To turn one on, rename it to `.yml` and add the secret its header names | Paid per PR |
 
 On a private repo on the free GitHub plan, branch protection isn't available, so CI shows red or green but can't stop a merge. The merge-gate hook is the real gate there, and it only runs inside Claude Code. For a repo with no CI, set `MERGE_GATE_ALLOW_NO_CHECKS=1`.
 
