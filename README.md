@@ -9,7 +9,7 @@ Starter repo for new projects built with Claude Code. **Spec Kit** handles desig
 ```
 CLAUDE.md                     Agent instructions + workflow (short, points to docs)
 AGENTS.md                     Pointer for non-Claude agents (Copilot, Codex, Cursor)
-REVIEW.md                     What every reviewer checks, severity, review loop limits
+REVIEW.md                     What every reviewer checks, severity, loop limits, review panel
 docs/
   prd.md                      Product-level requirements, goals, NON-goals
   architecture.md             Current system shape across all features
@@ -24,12 +24,17 @@ docs/
   hooks/merge-gate.(sh|py)    Blocks merging on red CI and pushing to main/master
   hooks/format-file.py        Formats each edited file using hooks/format.json
   hooks/format.json           Extension to formatter map (empty; see format.example.json)
+  agents/reviewer-*.md        Review panel lenses: security, code, ux, ui (add files to extend)
+  agents/fixer.md, approver.md  Fixes CHANGES findings; writes the APPROVE or ESCALATE decision
+  skills/review-panel/        /review-panel: reviewers in parallel, fix loop, approver
   skills/speckit-*            Spec Kit skills (/speckit-specify, /speckit-plan, ...)
 .github/
   workflows/ci.yml            Runs scripts/check.sh on every PR and on the default branch
   workflows/*.yml.disabled    Optional paid Claude review and security review (off)
   pull_request_template.md    Summary, spec, testing, risk, revert, unfixed findings
 scripts/check.(sh|ps1)        The one definition of green: format, lint, test, build
+scripts/dashboard.(py|html)   Live, read-only board of every feature (python3 scripts/dashboard.py)
+scripts/tests/                Tests for the dashboard (python3 -m unittest discover -s scripts/tests)
 scripts/init-project.(ps1|sh) One-time placeholder fill + Superpowers install
 specs/                        Created by /speckit-specify, one folder per feature
 ```
@@ -54,7 +59,7 @@ specs/                        Created by /speckit-specify, one folder per featur
    This fills `[PROJECT_NAME]` and date placeholders and installs Superpowers at user scope.
 3. Write `docs/prd.md` yourself (or with Claude in chat). Non-goals matter most.
 4. In Claude Code: `/speckit-constitution` to tailor the rules to this project.
-5. Fill in **Commands** and **Stack** in `CLAUDE.md` once they exist, and the same commands at the top of `scripts/check.sh` and `scripts/check.ps1`. Uncomment the setup step for your stack in `.github/workflows/ci.yml`, and map file extensions to formatters in `.claude/hooks/format.json` if you want format-on-edit.
+5. Fill in **Commands** and **Stack** in `CLAUDE.md` once they exist, and the same commands at the top of `scripts/check.sh` and `scripts/check.ps1`. Uncomment the setup step for your stack in `.github/workflows/ci.yml`, and map file extensions to formatters in `.claude/hooks/format.json` if you want format-on-edit. In `.claude/agents/reviewer-ux.md` and `reviewer-ui.md`, set `review-paths` to your UI folders so those reviewers skip back-end-only changes.
 6. First feature: `/speckit-specify`.
 
 ## Which track?
@@ -75,7 +80,8 @@ Adapted from Anthropic's write-up on [solving code review](https://claude.dev/bl
 | Where | What | Cost |
 |-------|------|------|
 | Local, while editing | `format-file.py` hook formats each edited file (once `format.json` is filled in) | Free |
-| Local, before the PR | `scripts/check` (format, lint, test, build); Superpowers reviews; `/code-review` then `/security-review`, each finding fixed or answered in the PR | Free (subscription) |
+| Local, before the PR | `scripts/check` (format, lint, test, build); Superpowers reviews; `/review-panel` (security, code, UX and UI reviewers in parallel, a fix loop of at most 3 rounds, then an approver that escalates risky changes to you) | Free (subscription) |
+| Watching | `python3 scripts/dashboard.py --open`: every feature by stage, with task progress, reviewer verdicts, the decision, CI and the files, refreshed every 2 seconds | Free |
 | CI, on every PR | `ci.yml` job `check` runs `scripts/check.sh` | Free (Actions minutes) |
 | Merge | `merge-gate.py` blocks `gh pr merge` until `gh pr checks` is green, blocks pushes to `main`/`master`, and lets a local `git merge`/`git pull` of a branch into them through only if that branch's PR checks are green (CI ran `scripts/check.sh` on it). If Python can't start, `merge-gate.sh` still blocks merges | Free |
 | After merge | Escaped bugs in `docs/state.md` get a regression test and, when a reviewer should have caught them, a rule in `REVIEW.md` | Free |

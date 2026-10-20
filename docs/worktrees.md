@@ -35,6 +35,16 @@ Create the worktree with `git worktree add` yourself (or ask Claude to run that 
 - Copy gitignored config you need, such as `.env` or `appsettings.Development.json`, from the main checkout.
 - Two features running dev servers at once need different ports. Tell the session which one to use.
 
+## Watch every feature at once
+
+Run the dashboard from the main checkout and leave it open:
+
+```powershell
+python3 scripts/dashboard.py --open
+```
+
+It finds every worktree and `NNN-*` branch by itself and shows each feature's stage, task progress, current Superpowers task, reviewer verdicts, decision and CI, refreshed every 2 seconds. Click a feature to read its spec, reviews and decision. It only reads files, so it can't get in the way of a build. How it works out each stage: `scripts/dashboard.py`, `build_feature`.
+
 ## Watch the work in Claude
 
 - **One session per feature.** Each session's sidebar row shows what it's doing, and its task list shows which step it's on.

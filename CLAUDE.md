@@ -13,6 +13,7 @@ Full product context: `docs/prd.md`. Current status and next step: `docs/state.m
 # Run:     [e.g. dotnet run --project src/Api]
 # Lint:    [e.g. dotnet format --verify-no-changes]
 # Check: ./scripts/check.sh               # format, lint, test, build; the one definition of green
+# Board: python3 scripts/dashboard.py --open   # live, read-only view of every feature
 ```
 
 ## Stack
@@ -57,7 +58,7 @@ This project uses **Spec Kit for design** and **Superpowers for implementation**
 
 **2. Feature track: design (Spec Kit owns this)**
 0. Worktree first: from the main checkout on `master`, `git worktree add .worktrees/NNN-feature-name -b NNN-feature-name master` (NNN = next number unused in `specs/` and in `git worktree list`; use `git worktree add`, not Claude's own worktree tool, so names match). Every later step runs in that folder. Guide: `docs/worktrees.md`.
-1. Mockup: any feature with new or changed UI gets a mockup on a claude.ai Design canvas before `/speckit-specify`. Planning waits for the owner's explicit approval. Record it in `specs/NNN-*/mockup.md` (canvas link, approval date, what was approved), with a copy of the canvas files in `specs/NNN-*/mockup/`.
+1. Mockup: any feature with new or changed UI gets a mockup on a claude.ai Design canvas before `/speckit-specify`. Planning waits for the owner's explicit approval. Record it in `specs/NNN-*/mockup.md` (canvas link, an `Approved: YYYY-MM-DD` line, what was approved), with a copy of the canvas files in `specs/NNN-*/mockup/`.
 2. `/speckit-specify` : what and why, no tech choices. Give it the worktree's NNN.
 3. `/speckit-clarify` : resolve ambiguity before planning
 4. `/speckit-plan` : technical approach
@@ -70,7 +71,7 @@ During these steps Spec Kit is the source of truth. Do not run Superpowers brain
 Do NOT use `/speckit-implement`. Instead, for `specs/NNN-*/tasks.md`:
 1. using-git-worktrees : confirms you're in the feature's worktree from design step 0, installs dependencies and checks the baseline is green
 2. subagent-driven-development : one fresh subagent per task from tasks.md, test-first (red, green, refactor), spec-compliance review then code-quality review
-3. requesting-code-review : before merge. Then run `/code-review`, then `/security-review`, on the branch. Fix each finding test-first, or write why not in the PR's "Review findings not fixed".
+3. requesting-code-review, then `/review-panel` : every `.claude/agents/reviewer-*.md` in parallel, fixes for at most 3 rounds, then the approver writes `decision.md` (`REVIEW.md`, Review panel). On ESCALATE, stop and ask the owner. Findings left unfixed go in the PR's "Review findings not fixed".
 4. Open a PR, wait for `gh pr checks --watch` to be green, then merge. The merge-gate hook (`.claude/hooks/merge-gate.py`) blocks merging on red, pushing to `main`/`master`, and local merges of a branch whose PR checks aren't green.
 
 If implementation reveals the spec was wrong, stop and update spec.md/plan.md first, then continue.

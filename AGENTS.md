@@ -11,3 +11,4 @@ Notes for non-Claude agents:
   - Run `./scripts/check.sh` (or `./scripts/check.ps1`) and see it pass before saying work is done.
   - Never push to `main` or `master` directly. Open a PR and merge only once `gh pr checks` is green.
 - Review against `REVIEW.md`: what to always check, what not to flag, the severity levels and the review loop limits. Fix each finding or answer it in the PR's "Review findings not fixed".
+- The review panel (`/review-panel` and `.claude/agents/`) is Claude Code only. Without it, review the branch once per lens (security, code, UX, UI) against `REVIEW.md` before opening the PR, and write the result to `specs/NNN-*/reviews/round-N/review-<lens>.md` with the same `VERDICT:` first line, so the dashboard still shows it.

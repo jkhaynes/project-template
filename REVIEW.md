@@ -1,6 +1,6 @@
 # REVIEW.md
 
-Guidance for every reviewer of this repo: the Superpowers code-quality review, `requesting-code-review`, `/code-review`, `/security-review`, and any PR bot. Read it before reviewing a change.
+Guidance for every reviewer of this repo: the review panel agents (`.claude/agents/reviewer-*.md`), the Superpowers code-quality review, `requesting-code-review`, `/code-review`, `/security-review`, and any PR bot. Read it before reviewing a change.
 
 ## Always check
 
@@ -33,6 +33,23 @@ Only Critical and Important block. Every blocking finding is fixed (test-first) 
 - From round 2 on, review only the new diff since the last round.
 - Never repeat a finding that was already resolved or dismissed.
 - When one bug appears in several places, flag the class once and list every location.
+
+## Review panel
+
+`/review-panel` (`.claude/skills/review-panel/SKILL.md`) runs after requesting-code-review, before the PR:
+
+1. Every `.claude/agents/reviewer-*.md` reviews the branch in parallel and writes `specs/NNN-*/reviews/round-N/review-<lens>.md`.
+2. Any CHANGES: the `fixer` agent fixes each Critical and Important finding test-first and writes `fixes.md` in the same round folder. Then the next round.
+3. No CHANGES: the `approver` agent writes `specs/NNN-*/decision.md`, starting `APPROVE` or `ESCALATE`. It escalates money, auth, CI, hooks, dependencies, migrations, product decisions and changes from the approved mockup. APPROVE never merges by itself; the PR still needs green CI and the merge gate.
+4. Round 3 with CHANGES still open: the skill writes an ESCALATE decision and stops.
+
+The files are a contract. The dashboard (`scripts/dashboard.py`) reads them:
+
+- A review file's first line is exactly `VERDICT: PASS`, `VERDICT: CHANGES` or `VERDICT: SKIPPED`.
+- `decision.md`'s first line is exactly `APPROVE` or `ESCALATE`, followed by `## Why` and, when escalating, `## For the owner`.
+- Review rounds and decisions are committed on the feature branch, so they stay with the feature after it merges.
+
+**Adding a reviewer:** copy one of the `reviewer-*.md` files to `reviewer-<lens>.md` and change its name, description, focus and model. The panel and the dashboard pick it up with no other change. Add a `review-paths:` list of globs to its frontmatter to skip it when no changed file matches (the UX and UI reviewers ship with `[e.g. ...]` placeholders, which mean "always run" until you fill them in).
 
 ## Learned review rules
 
