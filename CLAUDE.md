@@ -42,6 +42,7 @@ Full product context: `docs/prd.md`. Current status and next step: `docs/state.m
 | Non-negotiable engineering rules | `.specify/memory/constitution.md` |
 | What reviewers check, severity, loop limits | `REVIEW.md` |
 | Feature specs, plans, tasks | `specs/NNN-feature-name/` |
+| Working in and watching worktrees | `docs/worktrees.md` |
 
 Read these when the task needs them, not up front.
 
@@ -55,18 +56,19 @@ This project uses **Spec Kit for design** and **Superpowers for implementation**
 - **Spike / experiment**: Superpowers brainstorming, throwaway branch, no spec. If it survives, promote it to a feature.
 
 **2. Feature track: design (Spec Kit owns this)**
-0. Mockup first: any feature with new or changed UI gets a mockup on a claude.ai Design canvas before `/speckit-specify`. Planning waits for the owner's explicit approval. Record it in `specs/NNN-*/mockup.md` (canvas link, approval date, what was approved), with a copy of the canvas files in `specs/NNN-*/mockup/`.
-1. `/speckit-specify` : what and why, no tech choices
-2. `/speckit-clarify` : resolve ambiguity before planning
-3. `/speckit-plan` : technical approach
-4. `/speckit-tasks` : ordered task list
-5. `/speckit-analyze` : consistency check across spec, plan, tasks
+0. Worktree first: from the main checkout on `master`, `git worktree add .worktrees/NNN-feature-name -b NNN-feature-name master` (NNN = next number unused in `specs/` and in `git worktree list`; use `git worktree add`, not Claude's own worktree tool, so names match). Every later step runs in that folder. Guide: `docs/worktrees.md`.
+1. Mockup: any feature with new or changed UI gets a mockup on a claude.ai Design canvas before `/speckit-specify`. Planning waits for the owner's explicit approval. Record it in `specs/NNN-*/mockup.md` (canvas link, approval date, what was approved), with a copy of the canvas files in `specs/NNN-*/mockup/`.
+2. `/speckit-specify` : what and why, no tech choices. Give it the worktree's NNN.
+3. `/speckit-clarify` : resolve ambiguity before planning
+4. `/speckit-plan` : technical approach
+5. `/speckit-tasks` : ordered task list
+6. `/speckit-analyze` : consistency check across spec, plan, tasks
 
 During these steps Spec Kit is the source of truth. Do not run Superpowers brainstorming or writing-plans on top of a Spec Kit feature; that creates a second, competing plan.
 
 **3. Feature track: implementation (Superpowers owns this)**
 Do NOT use `/speckit-implement`. Instead, for `specs/NNN-*/tasks.md`:
-1. Feature branch in the main checkout (`git checkout -b NNN-feature-name`), so the owner can follow along in their own editor. No worktrees (skip using-git-worktrees).
+1. using-git-worktrees : confirms you're in the feature's worktree from design step 0, installs dependencies and checks the baseline is green
 2. subagent-driven-development : one fresh subagent per task from tasks.md, test-first (red, green, refactor), spec-compliance review then code-quality review
 3. requesting-code-review : before merge. Then run `/code-review`, then `/security-review`, on the branch. Fix each finding test-first, or write why not in the PR's "Review findings not fixed".
 4. Open a PR, wait for `gh pr checks --watch` to be green, then merge. The merge-gate hook (`.claude/hooks/merge-gate.py`) blocks merging on red, pushing to `main`/`master`, and local merges of a branch whose PR checks aren't green.

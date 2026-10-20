@@ -1,6 +1,6 @@
 # Project Template: Spec Kit + Superpowers
 
-Starter repo for new projects built with Claude Code. **Spec Kit** handles design (spec, plan, tasks) and **Superpowers** handles implementation (TDD, subagent execution, review). Quality gates (a local check script, CI, review passes and a merge-gate hook) keep red code out of the default branch.
+Starter repo for new projects built with Claude Code. **Spec Kit** handles design (spec, plan, tasks) and **Superpowers** handles implementation (one worktree per feature, TDD, subagent execution, review). Quality gates (a local check script, CI, review passes and a merge-gate hook) keep red code out of the default branch.
 
 > Replace this README with the real project README once the project has a name and a purpose. The workflow details live in `CLAUDE.md`, so nothing is lost.
 
@@ -15,6 +15,7 @@ docs/
   architecture.md             Current system shape across all features
   testing.md                  Test levels, locations, rules, commands
   state.md                    Session-to-session status and next steps
+  worktrees.md                One worktree per feature: starting, watching, finishing
   adr/                        One file per architectural decision + index
 .specify/                     Spec Kit (templates, Python scripts, constitution)
   memory/constitution.md      Pre-filled starter: TDD, Superpowers owns implementation
@@ -83,6 +84,8 @@ Adapted from Anthropic's write-up on [solving code review](https://claude.dev/bl
 On a private repo on the free GitHub plan, branch protection isn't available, so CI shows red or green but can't stop a merge. The merge-gate hook is the real gate there, and it only runs inside Claude Code. For a repo with no CI, set `MERGE_GATE_ALLOW_NO_CHECKS=1`.
 
 ## Notes and gotchas
+
+- **One worktree per feature.** Each feature is built in `.worktrees/NNN-feature-name` while the main checkout stays on the default branch, so several features can run at once. `docs/worktrees.md` covers starting one and watching its changes in Claude, VS Code or a terminal.
 
 - **Hooks need Python 3 on PATH as `python3`.** Both hooks are Python scripts. If `python3` isn't found, the merge gate blocks every merge and push and format-on-edit does nothing.
 

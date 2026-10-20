@@ -2,8 +2,9 @@
 .claude/settings.local.json
 CLAUDE.local.md
 
-# Superpowers worktrees
+# Feature worktrees (docs/worktrees.md) and Claude Code's own worktrees
 .worktrees/
+.claude/worktrees/
 
 # Secrets
 .env
