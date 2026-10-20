@@ -341,7 +341,7 @@ def worktree_feature_dir(wt, branch):
     try:
         with open(os.path.join(wt, ".specify", "feature.json"), encoding="utf-8") as f:
             name = os.path.basename(str(json.load(f).get("feature_directory", "")).rstrip("/\\"))
-        if name and os.path.isdir(os.path.join(wt, "specs", name)):
+        if FEATURE_RE.match(name) and os.path.isdir(os.path.join(wt, "specs", name)):
             return name
     except (OSError, ValueError, AttributeError):
         pass
