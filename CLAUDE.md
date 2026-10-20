@@ -58,7 +58,7 @@ This project uses **Spec Kit for design** and **Superpowers for implementation**
 - **Spike / experiment**: Superpowers brainstorming, throwaway branch, no spec. If it survives, promote it to a feature.
 
 **2. Feature track: design (Spec Kit owns this)**
-0. Worktree first: from the main checkout on `master`, `git worktree add .worktrees/NNN-feature-name -b NNN-feature-name master` (NNN = next number unused in `specs/` and in `git worktree list`; use `git worktree add`, not Claude's own worktree tool, so names match). Every later step runs in that folder. Guide: `docs/worktrees.md`.
+0. Worktree first: from the main checkout on `master`, `git worktree add .worktrees/NNN-feature-name -b NNN-feature-name master` (NNN = next number unused in `specs/` and in `git worktree list`; use `git worktree add`, not Claude's own worktree tool, so names match). Then start a new Claude session with that folder as its working directory (in the Claude desktop app, start it yourself; elsewhere, tell the owner to run `claude` there) and continue the feature in that session. Every later step runs in that folder. Guide: `docs/worktrees.md`.
 1. Mockup: any feature with new or changed UI gets a mockup on a claude.ai Design canvas before `/speckit-specify`. Planning waits for the owner's explicit approval. Record it in `specs/NNN-*/mockup.md` (canvas link, an `Approved: YYYY-MM-DD` line, what was approved), with a copy of the canvas files in `specs/NNN-*/mockup/`.
 2. `/speckit-specify` : what and why, no tech choices. Give it the worktree's NNN.
 3. `/speckit-clarify` : resolve ambiguity before planning
@@ -71,7 +71,7 @@ During these steps Spec Kit is the source of truth. Do not run Superpowers brain
 **3. Feature track: implementation (Superpowers owns this)**
 Do NOT use `/speckit-implement`. Instead, for `specs/NNN-*/tasks.md`:
 1. using-git-worktrees : confirms you're in the feature's worktree from design step 0, installs dependencies and checks the baseline is green
-2. subagent-driven-development : one fresh subagent per task from tasks.md, test-first (red, green, refactor), spec-compliance review then code-quality review
+2. subagent-driven-development : one fresh subagent per task from tasks.md, test-first (red, green, refactor), spec-compliance review then code-quality review. When a task passes its review, check it off in tasks.md (`- [x]`) in that task's commit; Superpowers doesn't, and the dashboard and the approver count those boxes.
 3. requesting-code-review, then `/review-panel` : every `.claude/agents/reviewer-*.md` in parallel, fixes for at most 3 rounds, then the approver writes `decision.md` (`REVIEW.md`, Review panel). On ESCALATE, stop and ask the owner. Findings left unfixed go in the PR's "Review findings not fixed".
 4. Open a PR, wait for `gh pr checks --watch` to be green, then merge. The merge-gate hook (`.claude/hooks/merge-gate.py`) blocks merging on red, pushing to `main`/`master`, and local merges of a branch whose PR checks aren't green.
 
