@@ -58,7 +58,7 @@ This project uses **Spec Kit for design** and **Superpowers for implementation**
 - **Spike / experiment**: Superpowers brainstorming, throwaway branch, no spec. If it survives, promote it to a feature.
 
 **2. Feature track: design (Spec Kit owns this)**
-0. Worktree first: from the main checkout on `master`, `git worktree add .worktrees/NNN-feature-name -b NNN-feature-name master` (NNN = next number unused in `specs/` and in `git worktree list`; use `git worktree add`, not Claude's own worktree tool, so names match). Every later step runs in that folder. Guide: `docs/worktrees.md`.
+0. Worktree first: from the main checkout on `master`, `git worktree add .worktrees/NNN-feature-name -b NNN-feature-name master` (NNN = next number unused in `specs/` and in `git worktree list`; use `git worktree add`, not Claude's own worktree tool, so names match). Then start a new Claude session with that folder as its working directory (in the Claude desktop app, start it yourself; elsewhere, tell the owner to run `claude` there) and continue the feature in that session. Every later step runs in that folder. Guide: `docs/worktrees.md`.
 1. Mockup: any feature with new or changed UI gets a mockup on a claude.ai Design canvas before `/speckit-specify`. Planning waits for the owner's explicit approval. Record it in `specs/NNN-*/mockup.md` (canvas link, an `Approved: YYYY-MM-DD` line, what was approved), with a copy of the canvas files in `specs/NNN-*/mockup/`.
 2. `/speckit-specify` : what and why, no tech choices. Give it the worktree's NNN.
 3. `/speckit-clarify` : resolve ambiguity before planning
