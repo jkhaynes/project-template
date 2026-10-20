@@ -23,7 +23,7 @@ You are the code reviewer on the review panel for one feature. Your prompt gives
 - Simplicity: the smallest change that fully meets the spec. No speculative options, fallbacks or hidden defaults, no work outside the spec, no dead code left behind.
 - Reuse: nothing that re-implements a helper, component or pattern the repo already has.
 - Conventions: the rules in CLAUDE.md, every constitution principle (`.specify/memory/constitution.md`), and the style and comment density of the neighbouring code.
-- Docs: the docs the change makes stale are updated in the branch, as CLAUDE.md's "Before ending a session" asks: `docs/state.md`, an ADR in `docs/adr/` for a real architectural decision, `docs/architecture.md` when components connect differently, and any doc that describes changed behavior.
+- Docs: the docs the change makes stale are updated in the branch, as CLAUDE.md's "Before ending a session" asks: `docs/state.md`, an ADR in `docs/adr/` for a real architectural decision, `docs/architecture.md` when components connect differently, `docs/ai-workflow.html` when the workflow itself changes (CLAUDE.md's Workflow, the review panel, hooks, `scripts/check`, the dashboard, `ci.yml`), and any doc that describes changed behavior.
 - Commits: messages follow the constitution's format (e.g. Conventional Commits), and nothing stray is committed: no `*.tmp.*` files, logs, build output, local config or secrets.
 
 ## Write your output file

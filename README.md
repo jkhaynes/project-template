@@ -16,6 +16,7 @@ docs/
   testing.md                  Test levels, locations, rules, commands
   state.md                    Session-to-session status and next steps
   worktrees.md                One worktree per feature: starting, watching, finishing
+  ai-workflow.html            The whole AI workflow as one diagram (open in a browser)
   adr/                        One file per architectural decision + index
 .specify/                     Spec Kit (templates, Python scripts, constitution)
   memory/constitution.md      Pre-filled starter: TDD, Superpowers owns implementation
@@ -70,7 +71,7 @@ specs/                        Created by /speckit-specify, one folder per featur
 | Spike or experiment | Superpowers brainstorming on a throwaway branch |
 | Existing repo without this setup | Copy `docs/`, `CLAUDE.md`, `AGENTS.md`, `REVIEW.md`, `scripts/check.*`, `.claude/hooks/`, `.claude/settings.json` and `.github/`, then `specify init --here --integration claude --script py` |
 
-Full step-by-step is in `CLAUDE.md` under **Workflow**.
+Full step-by-step is in `CLAUDE.md` under **Workflow**. For the picture, open `docs/ai-workflow.html` in a browser.
 
 ## Quality gates
 

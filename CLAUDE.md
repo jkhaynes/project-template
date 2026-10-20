@@ -44,6 +44,7 @@ Full product context: `docs/prd.md`. Current status and next step: `docs/state.m
 | What reviewers check, severity, loop limits | `REVIEW.md` |
 | Feature specs, plans, tasks | `specs/NNN-feature-name/` |
 | Working in and watching worktrees | `docs/worktrees.md` |
+| The whole AI workflow as one diagram | `docs/ai-workflow.html` (open in a browser) |
 
 Read these when the task needs them, not up front.
 
@@ -80,6 +81,7 @@ If implementation reveals the spec was wrong, stop and update spec.md/plan.md fi
 - Update `docs/state.md` (what changed, what's next, any blockers).
 - Made a real architectural decision (library, data store, pattern, trade-off)? Add an ADR in `docs/adr/`.
 - Changed how components connect? Update `docs/architecture.md`.
+- Changed the workflow itself (this Workflow section, the review panel, hooks, `scripts/check`, the dashboard, `ci.yml`)? Update `docs/ai-workflow.html` to match.
 - Did a bug reach main? Log it under Escaped bugs in `docs/state.md` and close the loop.
 
 ## Learned rules

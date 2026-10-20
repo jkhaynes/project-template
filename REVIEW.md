@@ -49,7 +49,7 @@ The files are a contract. The dashboard (`scripts/dashboard.py`) reads them:
 - `decision.md`'s first line is exactly `APPROVE` or `ESCALATE`, followed by `## Why` and, when escalating, `## For the owner`.
 - Review rounds and decisions are committed on the feature branch, so they stay with the feature after it merges.
 
-**Adding a reviewer:** copy one of the `reviewer-*.md` files to `reviewer-<lens>.md` and change its name, description, focus and model. The panel and the dashboard pick it up with no other change. Add a `review-paths:` list of globs to its frontmatter to skip it when no changed file matches (the UX and UI reviewers ship with `[e.g. ...]` placeholders, which mean "always run" until you fill them in).
+**Adding a reviewer:** copy one of the `reviewer-*.md` files to `reviewer-<lens>.md` and change its name, description, focus and model. The panel and the dashboard pick it up with no other change; add it to the panel list in `docs/ai-workflow.html` too. Add a `review-paths:` list of globs to its frontmatter to skip it when no changed file matches (the UX and UI reviewers ship with `[e.g. ...]` placeholders, which mean "always run" until you fill them in).
 
 ## Learned review rules
 
