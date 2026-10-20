@@ -38,5 +38,9 @@ Done. Next:
   1. Fill in docs/prd.md (problem, users, goals, non-goals)
   2. Open Claude Code and run /speckit-constitution to tailor the constitution
   3. Fill in the Commands and Stack sections of CLAUDE.md
-  4. First feature: /speckit-specify
+  4. Fill in the same commands at the top of scripts/check.sh and scripts/check.ps1
+  5. Uncomment your stack's setup step in .github/workflows/ci.yml
+  6. Optional: map extensions to formatters in .claude/hooks/format.json (see format.example.json)
+     and set review-paths in .claude/agents/reviewer-ux.md and reviewer-ui.md to your UI folders
+  7. First feature: /speckit-specify
 MSG

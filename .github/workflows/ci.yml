@@ -1,0 +1,40 @@
+# CI starter: runs scripts/check.sh (format, lint, test, build) on every PR and on the default branch.
+# Uncomment the setup step for this project's stack. Keep the job name `check`: the merge gate
+# (.claude/hooks/merge-gate.py) waits on `gh pr checks`, and docs refer to it by name.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node / TypeScript / Angular:
+      # - uses: actions/setup-node@v4
+      #   with:
+      #     node-version: 22
+      #     cache: npm
+      # - run: npm ci
+
+      # .NET / C#:
+      # - uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: 9.0.x
+      # - run: dotnet restore
+
+      - name: Check
+        run: ./scripts/check.sh
