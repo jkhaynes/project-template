@@ -14,4 +14,4 @@
 <!-- e.g. Revert this PR; no data migration. -->
 
 ## Review findings not fixed
-<!-- Each /code-review, /security-review or reviewer finding left as is, with the reason. "None" if all were fixed. -->
+<!-- Each review panel finding (specs/NNN-*/reviews/, decision.md) or other reviewer finding left as is, with the reason. "None" if all were fixed. -->

@@ -2,8 +2,8 @@
 #
 # Cost: every PR open and every push to it runs a Claude Code session in CI. With an API key
 # that is billed per token on your Anthropic account. With a subscription OAuth token it uses
-# your Claude plan's usage limits instead. The local /code-review and /security-review passes
-# (CLAUDE.md, implementation step 3) cover the same ground for free, which is why this is off.
+# your Claude plan's usage limits instead. The local review panel (/review-panel, CLAUDE.md
+# implementation step 3) covers the same ground on your subscription, which is why this is off.
 #
 # To turn it on:
 #   1. Add ONE repo secret (Settings > Secrets and variables > Actions):

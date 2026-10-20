@@ -1,6 +1,6 @@
 # REVIEW.md
 
-Guidance for every reviewer of this repo: the review panel agents (`.claude/agents/reviewer-*.md`), the Superpowers code-quality review, `requesting-code-review`, `/code-review`, `/security-review`, and any PR bot. Read it before reviewing a change.
+Guidance for every reviewer of this repo: the review panel (`.claude/agents/reviewer-*.md`, the fixer and the approver), the Superpowers task and code-quality reviews, `requesting-code-review`, and any PR bot. Read it before reviewing a change.
 
 ## Always check
 
