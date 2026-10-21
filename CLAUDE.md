@@ -88,3 +88,5 @@ If implementation reveals the spec was wrong, stop and update spec.md/plan.md fi
 
 <!-- Short rules from owner corrections, dated. -->
 
+- Stop only the processes you started, by PID. Never kill by image name (`taskkill /IM node.exe`, `chrome.exe`, `pkill node`): it ends the owner's browser and other sessions' servers. Run at most one dev server per worktree; agents that need the app at the same time serve their own copy of the build. (From back-room 007's review panel, 2026-10-20.)
+
