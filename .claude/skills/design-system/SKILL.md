@@ -9,7 +9,7 @@ You decide the app's look with the owner once, as files every prototype and the 
 
 ## New design system
 
-Skip this whole skill if the app has no UI (a CLI, a library, an API with no pages). Say so and stop.
+For an app that already has a brand or styling, use "An app that already has a look" below instead. Skip this whole skill if the app has no UI (a CLI, a library, an API with no pages). Say so and stop.
 
 1. **Ask what they bring.** One open question: what should this feel like, and do they have anything to show (a few words, links or screenshots of apps they like, a logo or brand colors, or nothing yet)? Read the PRD first so the question and the directions fit the users and purpose. Also settle the themes: light, dark, or both.
 2. **Directions.**
@@ -42,6 +42,15 @@ Skip this whole skill if the app has no UI (a CLI, a library, an API with no pag
    - v1 YYYY-MM-DD: first version
    ```
 6. Delete the `design/directions/*.tmp.html` files with a plain `rm` on each. Commit `design/` with `docs(design): design system v1`.
+
+## An app that already has a look
+
+When the app already has a brand or styling (brand docs CLAUDE.md points to, theme or token files, global stylesheets, shipped screens), don't offer directions: the look is decided, it just isn't written down as a system yet.
+
+1. Read the brand docs and the app's styling, and look at the main screens in the running app.
+2. Build `design/tokens.css`, `components.css` and `style.html` from what is actually there, with the same coverage as above. Where the app is inconsistent (three greys for one job, two button shapes), list each case and ask the owner which one wins.
+3. Review `style.html` in Lavish until approved, then write `design-system.md` as above, with "What the owner brought" naming the brand docs and existing styles it was taken from. Commit `docs(design): design system v1` on its own branch and PR.
+4. Moving the app's own styles onto `design/` is a separate change: suggest it as its own feature or small change, so this step doesn't touch app code.
 
 ## Changing the design system
 
