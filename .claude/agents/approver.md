@@ -30,7 +30,8 @@ ESCALATE if any of them fails, or if the change:
 - changes deploy, CI or hosting config, the hooks in `.claude/`, or the build scripts they run;
 - migrates a database schema, sends email or other messages, writes production data, or adds a dependency;
 - rests on a spec assumption that is really a product or business decision, such as pricing, public copy or what is free versus paid;
-- differs visibly from the approved mockup without the spec or plan explaining why.
+- differs visibly from the approved prototype (`mockup.md`, `mockup/prototype.html`) without the spec or plan explaining why;
+- changes the design system in `design/` without a new `Version` and `Approved:` date in `design/design-system.md`.
 
 ## Write decision.md
 

@@ -109,6 +109,16 @@ h1 { margin: 0; font-size: clamp(28px, 4vw, 40px); font-weight: 900; letter-spac
     <span class="key"><span class="sw auto"></span>Automatic (hook, CI, script)</span>
   </div>
 
+  <section class="phase" aria-labelledby="pds">
+    <div class="phase-head"><span class="tag">Once</span><h2 id="pds">Design system</h2><p>In /new-project, or when the look changes</p></div>
+    <ul class="flow">
+      <li><div class="node you"><b>Bring a look</b><span>Words, apps you like, brand colors, or nothing</span></div></li>
+      <li><div class="node"><b>Directions</b><span>Two or three if you brought little, one always navy and pink</span></div></li>
+      <li><div class="node"><b>Build it</b><code>design/ · tokens, components, style.html</code></div></li>
+      <li><div class="node you"><b>Approve in Lavish</b><code>Version: N · Approved: YYYY-MM-DD</code></div></li>
+    </ul>
+  </section>
+
   <section class="phase" aria-labelledby="p0">
     <div class="phase-head"><span class="tag">Start</span><h2 id="p0">Pick a track</h2><p>By size of change</p></div>
     <ul class="flow">
@@ -122,9 +132,10 @@ h1 { margin: 0; font-size: clamp(28px, 4vw, 40px); font-weight: 900; letter-spac
     <div class="phase-head"><span class="tag">Design</span><h2 id="p1">Spec Kit</h2><p>All inside the feature's worktree</p></div>
     <ul class="flow">
       <li><div class="node"><b>Worktree</b><code>.worktrees/NNN-name</code><span>Own folder, branch and Claude session</span></div></li>
-      <li><div class="node"><b>Mockup</b><span>Design canvas, if UI changes</span></div></li>
-      <li><div class="node you"><b>Approve mockup</b><code>Approved: YYYY-MM-DD</code></div></li>
-      <li><div class="node"><b>Specify</b><code>/speckit-specify</code></div></li>
+      <li><div class="node"><b>Prototype</b><code>/prototype</code><span>Clickable, design system only, with a state switcher. If UI changes</span></div></li>
+      <li><div class="node"><b>UX pass</b><code>reviewer-ux</code><span>Tries every path and state first</span></div></li>
+      <li><div class="node you"><b>Approve prototype</b><span>Click and annotate in Lavish</span><code>Approved: YYYY-MM-DD</code></div></li>
+      <li><div class="node"><b>Specify</b><code>/speckit-specify</code><span>Every approved state becomes a scenario</span></div></li>
       <li><div class="node you"><b>Clarify</b><code>/speckit-clarify</code><span>You answer questions</span></div></li>
       <li><div class="node"><b>Plan, tasks, analyze</b><code>/speckit-plan · tasks · analyze</code></div></li>
     </ul>
@@ -166,7 +177,7 @@ h1 { margin: 0; font-size: clamp(28px, 4vw, 40px); font-weight: 900; letter-spac
       <ul class="flow" style="margin-top:14px">
         <li><div class="node"><b>Approver</b><span>Checks every scenario, the tasks and scripts/check</span><code>decision.md</code></div></li>
         <li><div class="node"><b><span class="chip pass">APPROVE</span></b><span>On to the PR</span></div></li>
-        <li><div class="node you"><b><span class="chip esc">ESCALATE</span></b><span>Money, auth, CI, hooks, dependencies, migrations, product calls, mockup changes</span></div></li>
+        <li><div class="node you"><b><span class="chip esc">ESCALATE</span></b><span>Money, auth, CI, hooks, dependencies, migrations, product calls, prototype or design system changes</span></div></li>
       </ul>
     </div>
   </section>

@@ -20,7 +20,7 @@ git pull
 git worktree add .worktrees/008-supplier-compare -b 008-supplier-compare master
 ```
 
-Then do **everything** for that feature inside its folder: the mockup, every `/speckit-*` step, and the build. Open Claude there:
+Then do **everything** for that feature inside its folder: the prototype, every `/speckit-*` step, and the build. Open Claude there:
 
 - **Claude desktop app:** when Claude creates the worktree, it starts a new session in that folder for you (CLAUDE.md, design step 0), and the session appears in your sidebar. To open one yourself, start a new session and pick `.worktrees/008-supplier-compare` as its folder.
 - **Terminal:** `cd .worktrees/008-supplier-compare`, then `claude`.

@@ -2,6 +2,9 @@
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true
   },
+  "env": {
+    "LAVISH_AXI_TELEMETRY": "0"
+  },
   "permissions": {
     "allow": [
       "Bash(python3 .specify/scripts/python/*)",
@@ -11,7 +14,12 @@
       "Bash(git log:*)",
       "Bash(git worktree:*)",
       "Bash(rm *.tmp.*)",
-      "Bash(rm -f *.tmp.*)"
+      "Bash(rm -f *.tmp.*)",
+      "Bash(npx -y lavish-axi@0.1.94 *)"
+    ],
+    "deny": [
+      "Bash(npx -y lavish-axi@0.1.94 share *)",
+      "Bash(*lavish-axi* share*)"
     ]
   },
   "hooks": {

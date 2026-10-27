@@ -40,6 +40,7 @@ Full product context: `docs/prd.md`. Current status and next step: `docs/state.m
 | How the system fits together | `docs/architecture.md` |
 | Why a past decision was made | `docs/adr/` (index in `docs/adr/README.md`) |
 | How to test | `docs/testing.md` |
+| The app's look, prototypes, reviewing in Lavish | `docs/design.md`; the system itself is `design/` |
 | Non-negotiable engineering rules | `.specify/memory/constitution.md` |
 | What reviewers check, severity, loop limits | `REVIEW.md` |
 | Feature specs, plans, tasks | `specs/NNN-feature-name/` |
@@ -59,8 +60,8 @@ This project uses **Spec Kit for design** and **Superpowers for implementation**
 
 **2. Feature track: design (Spec Kit owns this)**
 0. Worktree first: from the main checkout on `master`, `git worktree add .worktrees/NNN-feature-name -b NNN-feature-name master` (NNN = next number unused in `specs/` and in `git worktree list`; use `git worktree add`, not Claude's own worktree tool, so names match). Then start a new Claude session with that folder as its working directory (in the Claude desktop app, start it yourself; elsewhere, tell the owner to run `claude` there) and continue the feature in that session. Every later step runs in that folder. Guide: `docs/worktrees.md`.
-1. Mockup: any feature with new or changed UI gets a mockup on a claude.ai Design canvas before `/speckit-specify`. Planning waits for the owner's explicit approval. Record it in `specs/NNN-*/mockup.md` (canvas link, an `Approved: YYYY-MM-DD` line, what was approved), with a copy of the canvas files in `specs/NNN-*/mockup/`.
-2. `/speckit-specify` : what and why, no tech choices. Give it the worktree's NNN.
+1. `/prototype` : any feature with new or changed UI gets a clickable prototype (`specs/NNN-*/mockup/prototype.html`) styled only with the design system in `design/`, tried by `reviewer-ux`, then reviewed by the owner in Lavish. Planning waits for the owner's explicit approval, recorded in `specs/NNN-*/mockup.md` (`Approved: YYYY-MM-DD`, `Design system: vN`, the screens and states approved). No design system yet? `/design-system` first. Guide: `docs/design.md`.
+2. `/speckit-specify` : what and why, no tech choices. Give it the worktree's NNN, and `mockup.md` if there is one: every screen and state it lists gets an acceptance scenario.
 3. `/speckit-clarify` : resolve ambiguity before planning
 4. `/speckit-plan` : technical approach
 5. `/speckit-tasks` : ordered task list
@@ -81,7 +82,7 @@ If implementation reveals the spec was wrong, stop and update spec.md/plan.md fi
 - Update `docs/state.md` (what changed, what's next, any blockers).
 - Made a real architectural decision (library, data store, pattern, trade-off)? Add an ADR in `docs/adr/`.
 - Changed how components connect? Update `docs/architecture.md`.
-- Changed the workflow itself (this Workflow section, the review panel, hooks, `scripts/check`, the dashboard, `ci.yml`)? Update `docs/ai-workflow.html` to match.
+- Changed the workflow itself (this Workflow section, the review panel, the design or prototype skills, hooks, `scripts/check`, the dashboard, `ci.yml`)? Update `docs/ai-workflow.html` to match.
 - Did a bug reach main? Log it under Escaped bugs in `docs/state.md` and close the loop.
 
 ## Learned rules
