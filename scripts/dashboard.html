@@ -208,7 +208,8 @@ function render() {
   if (!state) return;
   const feats = state.features;
   const needs = feats.filter(f => f.needsYou).length;
-  document.getElementById("repo").textContent = state.repo + " · " + state.base + " · " + feats.filter(f => f.stage !== "Merged").length + " active";
+  document.getElementById("repo").textContent = state.repo + " · " + state.base + " · " + feats.filter(f => f.stage !== "Merged").length + " active"
+    + (state.designSystem ? " · design system v" + state.designSystem.version : "");
   const nb = document.getElementById("needs");
   nb.textContent = "Needs you · " + needs; nb.setAttribute("aria-pressed", needsOnly);
   document.getElementById("merged").setAttribute("aria-pressed", showMerged);

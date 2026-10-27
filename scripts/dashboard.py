@@ -9,6 +9,7 @@ Run from anywhere in the repo (the main checkout or any worktree):
 It never writes anything. Each poll it reads the files the workflow already makes:
 specs/NNN-*/ (mockup.md, spec.md, plan.md, tasks.md, reviews/round-N/*.md,
 decision.md) from every worktree, every NNN-* branch and the default branch, the
+design system version in design/design-system.md on the default branch, the
 Superpowers progress log in each worktree, the reviewer agents in
 .claude/agents/reviewer-*.md, and PR checks from `gh` (cached, refreshed every 30s).
 How stages are worked out: docs/worktrees.md and REVIEW.md.
@@ -81,6 +82,17 @@ def parse_decision(text):
 
 def mockup_approved(text):
     return re.search(r"approved:\s*\d{4}-\d{2}-\d{2}", (text or "").replace("*", ""), re.I) is not None
+
+
+def design_version(text):
+    """design/design-system.md's Version, but only once the owner approved it."""
+    m = re.search(r"^version:\s*(\d+)\s*$", (text or "").replace("*", ""), re.I | re.M)
+    return int(m.group(1)) if m and mockup_approved(text) else None
+
+
+def mockup_design_version(text):
+    m = re.search(r"^design system:\s*v?(\d+)\b", (text or "").replace("*", ""), re.I | re.M)
+    return int(m.group(1)) if m else None
 
 
 def ledger_activity(text):
@@ -171,7 +183,8 @@ def gh_error_summary(stderr):
 
 # ---------- one feature ----------
 
-def build_feature(feature_id, source, panel, merged=False, ledger="", branch=None, worktree=None, ci=None):
+def build_feature(feature_id, source, panel, merged=False, ledger="", branch=None, worktree=None, ci=None,
+                  design_version=None):
     files = source.list()
     have = set(files)
 
@@ -209,10 +222,14 @@ def build_feature(feature_id, source, panel, merged=False, ledger="", branch=Non
     else:
         stage = "Design"
 
+    built_on = mockup_design_version(mockup)
     needs = None
     if not merged:
         if mockup is not None and not mockup_approved(mockup):
-            needs = "Mockup waiting for your approval"
+            needs = "Prototype waiting for your approval"
+        elif (stage in ("Design", "Build") and design_version and built_on is not None
+              and built_on < design_version):
+            needs = f"Prototype predates design system v{design_version}"
         elif decision and decision["verdict"] == "ESCALATE":
             needs = "Approver escalated"
 
@@ -241,7 +258,7 @@ def build_feature(feature_id, source, panel, merged=False, ledger="", branch=Non
     elif "spec.md" in have:
         activity = "Specified"
     else:
-        activity = "Mockup approved"
+        activity = "Prototype approved"
 
     return {
         "id": feature_id,
@@ -378,6 +395,7 @@ def collect_state(start, ci=None):
     feature_branches = sorted(b for b in branches | set(worktree_of) if FEATURE_RE.match(b))
     base_specs = set((git(root, "ls-tree", "--name-only", f"{base}:specs", check=False) or "").split())
     base_sha = (git(root, "rev-parse", base, check=False) or "").strip()
+    design = design_version(git(root, "show", f"{base}:design/design-system.md", check=False))
 
     features, sources = [], {}
     for branch in feature_branches:
@@ -392,13 +410,13 @@ def collect_state(start, ci=None):
             fid = worktree_feature_dir(wt, branch)
             src = DiskSource(os.path.join(wt, "specs", fid))
             f = build_feature(fid, src, lenses, ledger=newest_ledger(wt), branch=branch, worktree=wt,
-                              ci=ci.get(branch))
+                              ci=ci.get(branch), design_version=design)
         else:
             fid = branch
             src = GitSource(root, branch, f"specs/{branch}")
             sha = (git(root, "rev-parse", branch, check=False) or "").strip()
-            f = dict(_cached(("branch", sha, branch, tuple(lenses)),
-                             lambda: build_feature(fid, src, lenses, branch=branch)))
+            f = dict(_cached(("branch", sha, branch, tuple(lenses), design),
+                             lambda: build_feature(fid, src, lenses, branch=branch, design_version=design)))
             f["ci"] = ci.get(branch) or f["ci"]
         features.append(f)
         sources[f["id"]] = src
@@ -419,6 +437,7 @@ def collect_state(start, ci=None):
         "root": root,
         "base": base,
         "panel": panel,
+        "designSystem": {"version": design} if design else None,
         "features": features,
         "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "_sources": sources,

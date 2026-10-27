@@ -40,7 +40,7 @@ Only Critical and Important block. Every blocking finding is fixed (test-first) 
 
 1. Every `.claude/agents/reviewer-*.md` reviews the branch in parallel and writes `specs/NNN-*/reviews/round-N/review-<lens>.md`.
 2. Any CHANGES: the `fixer` agent fixes each Critical and Important finding test-first and writes `fixes.md` in the same round folder. Then the next round.
-3. No CHANGES: the `approver` agent writes `specs/NNN-*/decision.md`, starting `APPROVE` or `ESCALATE`. It escalates money, auth, CI, hooks, dependencies, migrations, product decisions and changes from the approved mockup. APPROVE never merges by itself; the PR still needs green CI and the merge gate.
+3. No CHANGES: the `approver` agent writes `specs/NNN-*/decision.md`, starting `APPROVE` or `ESCALATE`. It escalates money, auth, CI, hooks, dependencies, migrations, product decisions, changes from the approved prototype and unapproved design system changes. APPROVE never merges by itself; the PR still needs green CI and the merge gate.
 4. Round 3 with CHANGES still open: the skill writes an ESCALATE decision and stops.
 
 The files are a contract. The dashboard (`scripts/dashboard.py`) reads them:

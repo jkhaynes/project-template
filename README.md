@@ -16,6 +16,7 @@ docs/
   testing.md                  Test levels, locations, rules, commands
   state.md                    Session-to-session status and next steps
   worktrees.md                One worktree per feature: starting, watching, finishing
+  design.md                   Design system, clickable prototypes, reviewing in Lavish
   ai-workflow.html            The whole AI workflow as one diagram (open in a browser)
   adr/                        One file per architectural decision + index
 .specify/                     Spec Kit (templates, Python scripts, constitution)
@@ -28,6 +29,8 @@ docs/
   agents/reviewer-*.md        Review panel lenses: security, code, ux, ui (add files to extend)
   agents/fixer.md, approver.md  Fixes CHANGES findings; writes the APPROVE or ESCALATE decision
   skills/review-panel/        /review-panel: reviewers in parallel, fix loop, approver
+  skills/design-system/       /design-system: the app's look, decided once, in design/
+  skills/prototype/           /prototype: a clickable prototype per UI feature, approved before the spec
   skills/speckit-*            Spec Kit skills (/speckit-specify, /speckit-plan, ...)
 .github/
   workflows/ci.yml            Runs scripts/check.sh on every PR and on the default branch
@@ -36,6 +39,7 @@ scripts/check.(sh|ps1)        The one definition of green: format, lint, test, b
 scripts/dashboard.(py|html)   Live, read-only board of every feature (python3 scripts/dashboard.py)
 scripts/tests/                Tests for the dashboard (python3 -m unittest discover -s scripts/tests)
 scripts/init-project.(ps1|sh) One-time placeholder fill + Superpowers install
+design/                       Created by /design-system: tokens.css, components.css, style.html, design-system.md
 specs/                        Created by /speckit-specify, one folder per feature
 ```
 
@@ -43,6 +47,7 @@ specs/                        Created by /speckit-specify, one folder per featur
 
 - [Claude Code](https://code.claude.com)
 - Python 3, callable as `python3` (Spec Kit's skills use it)
+- Node.js, for `npx` (the design system and prototypes are reviewed in [Lavish](https://github.com/kunchenguid/lavish-axi), pinned in `docs/design.md`)
 - [uv](https://docs.astral.sh/uv/) and the Spec Kit CLI (only needed for upgrades):
   `uv tool install specify-cli --from git+https://github.com/github/spec-kit.git`
 
@@ -60,7 +65,8 @@ specs/                        Created by /speckit-specify, one folder per featur
 3. Write `docs/prd.md` yourself (or with Claude in chat). Non-goals matter most.
 4. In Claude Code: `/speckit-constitution` to tailor the rules to this project.
 5. Fill in **Commands** and **Stack** in `CLAUDE.md` once they exist, and the same commands at the top of `scripts/check.sh` and `scripts/check.ps1`. Uncomment the setup step for your stack in `.github/workflows/ci.yml`, and map file extensions to formatters in `.claude/hooks/format.json` if you want format-on-edit. In `.claude/agents/reviewer-ux.md` and `reviewer-ui.md`, set `review-paths` to your UI folders so those reviewers skip back-end-only changes.
-6. First feature: `/speckit-specify`.
+6. If the app has UI: `/design-system` to decide its look.
+7. First feature: a worktree (`docs/worktrees.md`), `/prototype` if it has UI, then `/speckit-specify`.
 
 ## Which track?
 

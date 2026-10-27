@@ -39,6 +39,18 @@ class ParsersTest(unittest.TestCase):
         self.assertFalse(d.mockup_approved("Canvas: https://x\nApproved: [DATE]\n"))
         self.assertFalse(d.mockup_approved("Canvas: https://x\n"))
 
+    def test_design_version_needs_an_approval(self):
+        self.assertEqual(d.design_version("# Design system\n\nVersion: 3\nApproved: 2026-10-27\n"), 3)
+        self.assertEqual(d.design_version("**Version:** 2\n**Approved:** 2026-10-27\n"), 2)
+        self.assertIsNone(d.design_version("Version: 3\nApproved: [DATE]\n"))
+        self.assertIsNone(d.design_version("Approved: 2026-10-27\n"))
+        self.assertIsNone(d.design_version(None))
+
+    def test_mockup_design_version(self):
+        self.assertEqual(d.mockup_design_version("Approved: 2026-10-27\nDesign system: v2\n"), 2)
+        self.assertEqual(d.mockup_design_version("**Design system:** 4\n"), 4)
+        self.assertIsNone(d.mockup_design_version("Canvas: https://x\nApproved: 2026-10-01\n"))
+
     def test_ledger_activity_is_last_meaningful_line(self):
         text = "# SDD ledger - plan: specs/007/plan.md\nTask 9: complete (abc123)\n- Task 10: fix round 1 dispatched\n\n"
         self.assertEqual(d.ledger_activity(text), "Task 10: fix round 1 dispatched")
@@ -116,6 +128,29 @@ class FeatureTest(unittest.TestCase):
         self.assertEqual(f["stage"], "Design")
         self.assertFalse(f["needsYou"])
         self.assertEqual(f["name"], "Value chart")
+
+    def test_prototype_older_than_design_system_needs_owner(self):
+        f = self.feature({"mockup.md": "Approved: 2026-10-01\nDesign system: v1\n"}, design_version=2)
+        self.assertTrue(f["needsYou"])
+        self.assertEqual(f["needsReason"], "Prototype predates design system v2")
+        f = self.feature({"mockup.md": "Approved: 2026-10-01\nDesign system: v1\n", "tasks.md": "- [ ] a\n"},
+                         design_version=2)
+        self.assertTrue(f["needsYou"])
+
+    def test_prototype_on_current_design_system_does_not_need_owner(self):
+        f = self.feature({"mockup.md": "Approved: 2026-10-01\nDesign system: v2\n"}, design_version=2)
+        self.assertFalse(f["needsYou"])
+        self.assertEqual(f["activity"], "Prototype approved")
+
+    def test_old_mockup_without_design_system_line_is_not_flagged(self):
+        f = self.feature({"mockup.md": "Canvas: x\nApproved: 2026-10-01\n"}, design_version=2)
+        self.assertFalse(f["needsYou"])
+
+    def test_stale_prototype_not_flagged_once_in_review(self):
+        f = self.feature({"mockup.md": "Approved: 2026-10-01\nDesign system: v1\n",
+                          "reviews/round-1/review-code.md": "VERDICT: PASS\n"}, design_version=2)
+        self.assertEqual(f["stage"], "Review")
+        self.assertFalse(f["needsYou"])
 
     def test_build_uses_tasks_and_ledger(self):
         f = self.feature({"spec.md": "# X\n", "tasks.md": "- [x] a\n- [ ] b\n"}, ledger="Task 2: fix round 1")
@@ -288,6 +323,17 @@ class RepoTest(unittest.TestCase):
                          "VERDICT: CHANGES\n")
         self.assertIsNone(d.read_feature_file(self.repo, state, "003-in-tree", "../../.gitignore"))
         self.assertIsNone(d.read_feature_file(self.repo, state, "nope", "tasks.md"))
+
+    def test_design_system_version_comes_from_the_default_branch(self):
+        self.assertIsNone(d.collect_state(self.repo, ci={})["designSystem"])
+        write(os.path.join(self.repo, "design/design-system.md"), "Version: 2\nApproved: 2026-10-27\n")
+        git(self.repo, "add", "-A")
+        git(self.repo, "commit", "-q", "-m", "design system v2")
+        write(os.path.join(self.wt, "specs/003-in-tree/mockup.md"), "Approved: 2026-10-01\nDesign system: v1\n")
+        state = d.collect_state(self.repo, ci={})
+        self.assertEqual(state["designSystem"], {"version": 2})
+        by_id = {f["id"]: f for f in state["features"]}
+        self.assertEqual(by_id["003-in-tree"]["needsReason"], "Prototype predates design system v2")
 
     def test_works_from_inside_a_worktree(self):
         state = d.collect_state(self.wt, ci={})
