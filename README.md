@@ -64,7 +64,7 @@ specs/                        Created by /speckit-specify, one folder per featur
    This fills `[PROJECT_NAME]` and date placeholders and installs Superpowers at user scope.
 3. Write `docs/prd.md` yourself (or with Claude in chat). Non-goals matter most.
 4. In Claude Code: `/speckit-constitution` to tailor the rules to this project.
-5. Fill in **Commands** and **Stack** in `CLAUDE.md` once they exist, and the same commands at the top of `scripts/check.sh` and `scripts/check.ps1`. Uncomment the setup step for your stack in `.github/workflows/ci.yml`, and map file extensions to formatters in `.claude/hooks/format.json` if you want format-on-edit. In `.claude/agents/reviewer-ux.md` and `reviewer-ui.md`, set `review-paths` to your UI folders so those reviewers skip back-end-only changes.
+5. Fill in **Commands** and **Stack** in `CLAUDE.md` once they exist, and the same commands at the top of `scripts/check.sh` and `scripts/check.ps1`. Uncomment the setup step for your stack in `.github/workflows/ci.yml`, and map file extensions to formatters in `.claude/hooks/format.json` if you want format-on-edit. In `.claude/agents/reviewer-ux.md` and `reviewer-ui.md`, set `review-paths` to your UI folders so those reviewers skip back-end-only changes, and in `reviewer-smells.md` to your source folders so it skips docs-only changes.
 6. If the app has UI: `/design-system` to decide its look.
 7. First feature: a worktree (`docs/worktrees.md`), `/prototype` if it has UI, then `/speckit-specify`.
 
