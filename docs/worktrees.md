@@ -43,7 +43,7 @@ Run the dashboard from the main checkout and leave it open:
 python3 scripts/dashboard.py --open
 ```
 
-It finds every worktree and `NNN-*` branch by itself and shows each feature's stage, task progress, current Superpowers task, reviewer verdicts, decision and CI, refreshed every 2 seconds. Click a feature to read its spec, reviews and decision. It only reads files, so it can't get in the way of a build. How it works out each stage: `scripts/dashboard.py`, `build_feature`.
+It finds every worktree and `NNN-*` branch by itself and shows each feature's stage, task progress, current Superpowers task, reviewer verdicts, decision and CI, refreshed every 2 seconds. The panel row shows each reviewer's fix rate: of its blocking findings the fixer has handled in any feature's `fixes.md`, how many changed the code. Click a feature to read its spec, reviews and decision. It only reads files, so it can't get in the way of a build. How it works out each stage: `scripts/dashboard.py`, `build_feature`.
 
 To see the same board inside Claude Code instead of a browser, load the `review-board` mod from `jkhaynes/ai-agent-skills` (`mods/review-board`) and run `/board`. It runs `python3 scripts/dashboard.py --json` only while its pane is open, at most every 15 seconds (the browser page's 2 seconds doesn't apply), and also lists the subagents that session is running. `--json`, `--ci-json` and `--file <feature> <path>` each print once and exit.
 

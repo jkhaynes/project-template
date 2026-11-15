@@ -46,6 +46,7 @@ Only Critical and Important block. Every blocking finding is fixed (test-first) 
 The files are a contract. The dashboard (`scripts/dashboard.py`) reads them:
 
 - A review file's first line is exactly `VERDICT: PASS`, `VERDICT: CHANGES` or `VERDICT: SKIPPED`.
+- Each finding in `fixes.md`'s `## Findings` is one numbered line starting with the lens (`code`, or `ui and ux` for a shared one) and a comma, and saying `fixed in <sha>` or `not changed, because <reason>`. The dashboard counts them per reviewer ("3/4 fixed" on the panel row): a reviewer whose findings are often left unchanged is one whose prompt needs tightening.
 - `decision.md`'s first line is exactly `APPROVE` or `ESCALATE`, followed by `## Why` and, when escalating, `## For the owner`.
 - Review rounds and decisions are committed on the feature branch, so they stay with the feature after it merges.
 

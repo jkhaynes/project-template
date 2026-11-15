@@ -94,6 +94,28 @@ class ParsersTest(unittest.TestCase):
         ctx = {"state": "OPEN", "statusCheckRollup": [{"state": "SUCCESS"}]}
         self.assertEqual(d.ci_summary(ctx)["state"], "green")
 
+    def test_parse_fixes_reads_each_findings_outcome(self):
+        text = (
+            "Starting commit: abc\n\n## Findings\n\n"
+            "1. reviewer-code, check fails: fixed in 6c7ccb1 and a6e5c17, tests `x`\n"
+            "   - a detail line that says not changed must not count\n"
+            "2. ui and ux (the same finding), plan panels: fixed in c0864df.\n"
+            "3. `reviewer-security`, token in a log line: not changed, because the spec allows it.\n"
+            "4. Code: something vague\n\n"
+            "Also in this round: 3aa2281 runs Prettier.\n\n"
+            "## Check\n1. not a finding: fixed in abc\n"
+        )
+        self.assertEqual(d.parse_fixes(text), [
+            {"lenses": ["code"], "outcome": "fixed"},
+            {"lenses": ["ui", "ux"], "outcome": "fixed"},
+            {"lenses": ["security"], "outcome": "kept"},
+            {"lenses": ["code"], "outcome": "unclear"},
+        ])
+
+    def test_parse_fixes_without_findings(self):
+        self.assertEqual(d.parse_fixes("Starting commit: abc\n"), [])
+        self.assertEqual(d.parse_fixes(None), [])
+
     def test_gh_error_summary(self):
         self.assertEqual(d.gh_error_summary('no pull requests found for branch "x"')["label"], "no PR")
         self.assertEqual(d.gh_error_summary("none of the git remotes configured for this repository point to a known GitHub host")["label"], "no GitHub remote")
@@ -176,6 +198,21 @@ class FeatureTest(unittest.TestCase):
         self.assertEqual(f["rounds"][0]["verdicts"]["code"], "CHANGES")
         self.assertTrue(f["rounds"][0]["fixes"])
         self.assertIn("2 of 4", f["activity"])
+
+    def test_findings_sum_fix_outcomes_over_rounds(self):
+        f = self.feature({
+            "reviews/round-1/review-code.md": "VERDICT: CHANGES\n",
+            "reviews/round-1/fixes.md": "## Findings\n1. code, a: fixed in abc\n2. code, b: not changed, because c\n",
+            "reviews/round-2/review-code.md": "VERDICT: CHANGES\n",
+            "reviews/round-2/fixes.md": "## Findings\n1. code and ux, d: fixed in def\n",
+        })
+        self.assertEqual(f["findings"], {
+            "code": {"fixed": 2, "kept": 1, "unclear": 0},
+            "ux": {"fixed": 1, "kept": 0, "unclear": 0},
+        })
+
+    def test_no_fixes_means_no_findings(self):
+        self.assertEqual(self.feature({"tasks.md": "- [ ] a\n"})["findings"], {})
 
     def test_round_10_sorts_after_round_2(self):
         files = {f"reviews/round-{n}/review-code.md": "VERDICT: PASS\n" for n in (1, 2, 10)}
@@ -317,6 +354,17 @@ class RepoTest(unittest.TestCase):
         self.assertTrue(t["worktree"].replace("\\", "/").endswith(".worktrees/003-in-tree"))
 
         self.assertEqual(by_id["004-new"]["stage"], "Design")
+
+    def test_panel_counts_fix_outcomes_across_features(self):
+        write(os.path.join(self.repo, "specs/001-done/reviews/round-1/fixes.md"),
+              "## Findings\n1. reviewer-code, a: fixed in abc\n2. security, b: not changed, because c\n")
+        git(self.repo, "add", "-A")
+        git(self.repo, "commit", "-q", "-m", "001 fixes")
+        write(os.path.join(self.wt, "specs/003-in-tree/reviews/round-1/fixes.md"),
+              "## Findings\n1. code, c: fixed in def\n2. code, d: not changed, because e\n3. design, f: fixed in 123\n")
+        panel = {p["lens"]: p for p in d.collect_state(self.repo, ci={})["panel"]}
+        self.assertEqual(panel["code"]["findings"], {"fixed": 2, "kept": 1, "unclear": 0})
+        self.assertEqual(panel["security"]["findings"], {"fixed": 0, "kept": 1, "unclear": 0})
 
     def test_read_file_only_inside_feature(self):
         state = d.collect_state(self.repo, ci={})
