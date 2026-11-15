@@ -81,6 +81,41 @@ def parse_decision(text):
     return {"verdict": first, "why": _section(lines, "why"), "forOwner": for_owner}
 
 
+FIX_ITEM_RE = re.compile(r"^\d+\.\s+(.*)$")
+
+
+def parse_fixes(text):
+    """Each numbered finding in a fixes.md "## Findings" section: the lenses that raised it, and
+    whether the fixer changed the code ("fixed in <sha>"), kept it ("not changed, because ..."), or neither."""
+    out = []
+    for line in _section(_lines(text), "findings").split("\n"):
+        m = FIX_ITEM_RE.match(line)
+        if not m:
+            continue
+        item = m.group(1)
+        who = re.split(r"[,:]", item, maxsplit=1)[0]
+        who = re.sub(r"\(.*?\)|`", "", who).lower()
+        lenses = [w.strip().removeprefix("reviewer-") for w in re.split(r"\band\b|/|&", who)]
+        lenses = [w for w in lenses if w]
+        rest = item.lower()
+        if re.search(r"\bnot (changed|fixed)\b", rest):
+            outcome = "kept"
+        elif re.search(r"\bfixed\b", rest):
+            outcome = "fixed"
+        else:
+            outcome = "unclear"
+        out.append({"lenses": lenses, "outcome": outcome})
+    return out
+
+
+def tally_findings(items, into=None):
+    into = {} if into is None else into
+    for item in items:
+        for lens in item["lenses"]:
+            into.setdefault(lens, {"fixed": 0, "kept": 0, "unclear": 0})[item["outcome"]] += 1
+    return into
+
+
 def mockup_approved(text):
     return re.search(r"approved:\s*\d{4}-\d{2}-\d{2}", (text or "").replace("*", ""), re.I) is not None
 
@@ -196,7 +231,7 @@ def build_feature(feature_id, source, panel, merged=False, ledger="", branch=Non
     decision = parse_decision(read("decision.md")) if "decision.md" in have else None
     mockup = read("mockup.md")
 
-    by_round = {}
+    by_round, findings = {}, {}
     for rel in files:
         m = ROUND_RE.match(rel)
         if not m:
@@ -205,6 +240,7 @@ def build_feature(feature_id, source, panel, merged=False, ledger="", branch=Non
         name = m.group(2)
         if name == "fixes.md":
             r["fixes"] = True
+            tally_findings(parse_fixes(read(rel)), findings)
         elif name.startswith("review-") and name.endswith(".md") and "/" not in name:
             r["verdicts"][name[len("review-"):-3]] = first_verdict(read(rel)) or "pending"
     rounds = [by_round[n] for n in sorted(by_round)]
@@ -274,6 +310,7 @@ def build_feature(feature_id, source, panel, merged=False, ledger="", branch=Non
         "round": n,
         "rounds": rounds,
         "verdicts": verdicts,
+        "findings": findings,
         "decision": decision,
         # Everything above used the full list; only the list shown (and readable) is capped.
         # Top-level files and reviews first, so a big mockup/ export can't push them out.
@@ -433,6 +470,12 @@ def collect_state(start, ci=None):
         sources[name] = src
 
     features.sort(key=lambda f: f["id"])
+    # How often the fixer acted on each lens's blocking findings, over every feature (merged ones too).
+    for p in panel:
+        p["findings"] = {"fixed": 0, "kept": 0, "unclear": 0}
+        for f in features:
+            for k, v in (f.get("findings") or {}).get(p["lens"], {}).items():
+                p["findings"][k] += v
     return {
         "repo": os.path.basename(root.rstrip("/\\")),
         "root": root,

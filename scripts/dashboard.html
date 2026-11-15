@@ -215,7 +215,13 @@ function render() {
   document.getElementById("merged").setAttribute("aria-pressed", showMerged);
   document.getElementById("panelsrc").textContent = state.panel.length + " reviewers in .claude/agents/reviewer-*.md";
   document.getElementById("panel").replaceChildren(
-    ...state.panel.map(p => el("span", { class: "pill" }, el("span", { class: "d" }), p.lens, el("span", { class: "sub", text: p.model }))),
+    ...state.panel.map(p => {
+      // Of this reviewer's blocking findings the fixer has handled (fixes.md, every feature), how many changed the code.
+      const f = p.findings || {}, acted = (f.fixed || 0) + (f.kept || 0);
+      const title = acted ? `${f.fixed} of ${acted} blocking findings changed the code; ${f.kept} left as is by the fixer` + (f.unclear ? `; ${f.unclear} unclear` : "") : null;
+      return el("span", { class: "pill", title }, el("span", { class: "d" }), p.lens, el("span", { class: "sub", text: p.model }),
+        acted ? el("span", { class: "sub mono", text: `${f.fixed}/${acted} fixed` }) : null);
+    }),
     el("span", { class: "pill add", text: "+ add a reviewer-*.md to extend" }));
   const board = document.getElementById("board");
   board.replaceChildren(...STAGES.filter(s => showMerged || s !== "Merged").map(s => {

@@ -28,10 +28,13 @@ You fix one review round for one feature. Your prompt gives the feature folder, 
 Starting commit: <sha from before your changes>
 
 ## Findings
-1. <reviewer>, <finding in a few words>: fixed in <short sha>, test <test name> / not changed, because <reason>
+1. <lens>, <finding in a few words>: fixed in <short sha>, test <test name> / not changed, because <reason>
 
 ## Check
 <the scripts/check command and its result>
 ```
+
+- One numbered line per Critical or Important finding. Start it with the lens from the review file's name (`review-code.md` -> `code`); for the same finding from several reviewers, join them with "and" (`ui and ux`). Then a comma.
+- Each line says either `fixed in <short sha>` or `not changed, because <reason>`, in those words. The dashboard counts them to show how often each reviewer's findings change the code. Put any detail on indented lines under it.
 
 Commit fixes.md with the round's last fix.
